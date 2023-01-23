@@ -1,4 +1,13 @@
 server:
   port: 8080
-  
+
+dataSource:
+  databaseType: MySQL
+  ip: localhost
+  port: 3306
+  databaseName: data-transport
+  userName: data_transport
+  password: data_transport_password
+  initDatabaseIfNotExist: true
+
 

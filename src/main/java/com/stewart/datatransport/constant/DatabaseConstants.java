@@ -15,4 +15,6 @@ public class DatabaseConstants {
     public static final String MYSQL_URL_PARAMETER_PLACEHOLDER = "?useSSL=false&serverTimezone=UTC";
 
     public static final String MYSQL_CONNECT_TEST_SQL = "select 1 from dual";
+
+    public static final String EMPTY_STR = "";
 }

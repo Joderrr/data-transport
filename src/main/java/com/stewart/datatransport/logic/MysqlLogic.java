@@ -6,6 +6,7 @@ import com.stewart.datatransport.enums.database.DatabaseType;
 import com.stewart.datatransport.pojo.vo.database.AddressAndPort;
 import com.stewart.datatransport.pojo.vo.database.ConnectTryResult;
 import com.stewart.datatransport.pojo.vo.database.DatabaseConfig;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
@@ -15,12 +16,15 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.stewart.datatransport.util.DatabaseConfigUtil.urlAssemble;
+
 /**
  * mysql operation
  *
  * @author stewart
  * @date 2023/1/17
  */
+@Slf4j
 @Component("mysql")
 @DBLogic(name = "mysql", type = DatabaseType.MySQL)
 public class MysqlLogic implements DatabaseLogic {
@@ -51,11 +55,21 @@ public class MysqlLogic implements DatabaseLogic {
      * @throws ClassNotFoundException could be thrown
      * @throws SQLException           could be thrown
      */
-    private boolean connectTest(String url, String username, String password) throws ClassNotFoundException, SQLException {
-        Class.forName(DatabaseConstants.MYSQL_DRIVER_NAME);
-        Connection connection = DriverManager.getConnection(url, username, password);
-        Statement statement = connection.createStatement();
-        return statement.execute(DatabaseConstants.MYSQL_CONNECT_TEST_SQL);
+    private boolean connectTest(String url, String username, String password) throws SQLException {
+        Connection connection = null;
+        try {
+            Class.forName(DatabaseConstants.MYSQL_DRIVER_NAME);
+            connection = DriverManager.getConnection(url, username, password);
+            Statement statement = connection.createStatement();
+            return statement.execute(DatabaseConstants.MYSQL_CONNECT_TEST_SQL);
+        }catch (ClassNotFoundException | SQLException e){
+            log.error("database connection test failed, because of {}", e.getMessage());
+            return false;
+        }finally {
+            if(connection != null){
+                connection.close();
+            }
+        }
     }
 
     /**
@@ -69,23 +83,8 @@ public class MysqlLogic implements DatabaseLogic {
         String databaseName = databaseConfig.getDatabaseName();
         List<AddressAndPort> addresses = databaseConfig.getAddress();
         for (AddressAndPort address : addresses) {
-            urlList.add(urlAssemble(address.getIp(), address.getPort(), databaseName) + DatabaseConstants.MYSQL_URL_PARAMETER_PLACEHOLDER);
+            urlList.add(urlAssemble(databaseConfig.getDatabaseType(), address.getIp(), address.getPort(), databaseName));
         }
         return urlList;
-    }
-
-    /**
-     * by using ip, port and database name to assemble mysql address's url
-     *
-     * @param ip           database's ip
-     * @param port         database's port
-     * @param databaseName database name
-     * @return assembled url
-     */
-    private String urlAssemble(String ip, String port, String databaseName) {
-        return DatabaseConstants.MYSQL_URL_PLACEHOLDER
-                .replace("{ip}", ip)
-                .replace("{port}", port)
-                .replace("{databaseName}", databaseName);
     }
 }
