@@ -6,17 +6,17 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * database connect try result
+ * object save result
  *
  * @author stewart
- * @date 2023/1/17
+ * @date 2023/2/16
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
-public class ConnectTryResult extends BaseResult {
+public class ObjectSaveResult extends BaseResult {
 
-    public ConnectTryResult(boolean success, String message){
+    public ObjectSaveResult(boolean success, String message){
         super.success = success;
         super.message = message;
     }

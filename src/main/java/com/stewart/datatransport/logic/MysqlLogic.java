@@ -5,7 +5,7 @@ import com.stewart.datatransport.constant.DatabaseConstants;
 import com.stewart.datatransport.enums.database.DatabaseType;
 import com.stewart.datatransport.pojo.vo.database.AddressAndPort;
 import com.stewart.datatransport.pojo.vo.database.ConnectTryResult;
-import com.stewart.datatransport.pojo.vo.database.DatabaseConfig;
+import com.stewart.datatransport.pojo.vo.database.DataSourceConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -30,7 +30,7 @@ import static com.stewart.datatransport.util.DatabaseConfigUtil.urlAssemble;
 public class MysqlLogic implements DatabaseLogic {
 
     @Override
-    public ConnectTryResult tryConnection(DatabaseConfig databaseConfig) {
+    public ConnectTryResult tryConnection(DataSourceConfig databaseConfig) {
         boolean executeResult = true;
         String executeMessage = "connect success";
         try {
@@ -52,7 +52,6 @@ public class MysqlLogic implements DatabaseLogic {
      * @param username database username
      * @param password database password
      * @return connect result
-     * @throws ClassNotFoundException could be thrown
      * @throws SQLException           could be thrown
      */
     private boolean connectTest(String url, String username, String password) throws SQLException {
@@ -78,7 +77,7 @@ public class MysqlLogic implements DatabaseLogic {
      * @param databaseConfig database configuration
      * @return resolved url address
      */
-    private List<String> getConfigurationUrls(DatabaseConfig databaseConfig) {
+    private List<String> getConfigurationUrls(DataSourceConfig databaseConfig) {
         List<String> urlList = new ArrayList<>();
         String databaseName = databaseConfig.getDatabaseName();
         List<AddressAndPort> addresses = databaseConfig.getAddress();

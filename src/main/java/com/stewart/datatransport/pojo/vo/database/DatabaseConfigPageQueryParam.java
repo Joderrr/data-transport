@@ -1,6 +1,7 @@
 package com.stewart.datatransport.pojo.vo.database;
 
 import com.stewart.datatransport.pojo.vo.BasePageParam;
+import lombok.Data;
 
 /**
  * database configuration page query param
@@ -8,10 +9,12 @@ import com.stewart.datatransport.pojo.vo.BasePageParam;
  * @author stewart
  * @date 2023/1/18
  */
-public class DatabaseConfigPageQueryParam extends BasePageParam {
+@Data
+public class DatabaseConfigPageQueryParam extends BasePageParam{
 
     /**
      * query parameter
      */
-    DatabaseConfig queryParam;
+    DataSourceConfig queryParam;
+
 }

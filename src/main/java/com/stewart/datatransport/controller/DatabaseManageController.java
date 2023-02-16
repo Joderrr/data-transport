@@ -3,7 +3,7 @@ package com.stewart.datatransport.controller;
 import com.stewart.datatransport.exception.ValidException;
 import com.stewart.datatransport.pojo.vo.GeneralResponse;
 import com.stewart.datatransport.pojo.vo.database.ConnectTryResult;
-import com.stewart.datatransport.pojo.vo.database.DatabaseConfig;
+import com.stewart.datatransport.pojo.vo.database.DataSourceConfig;
 import com.stewart.datatransport.pojo.vo.database.DatabaseConfigPageQueryParam;
 import com.stewart.datatransport.service.DatabaseManageService;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,7 +33,7 @@ public class DatabaseManageController extends BaseController {
      * @return general response with result
      */
     @RequestMapping(method = RequestMethod.POST, value = "/connectTest")
-    public GeneralResponse tryDBConnection(@RequestBody DatabaseConfig databaseConfig) throws ValidException {
+    public GeneralResponse tryDBConnection(@RequestBody DataSourceConfig databaseConfig) throws ValidException {
         parameterValidate(databaseConfig);
         return execute(() -> {
             ConnectTryResult connectTryResult = databaseManageService.tryConnection(databaseConfig);
@@ -48,7 +48,7 @@ public class DatabaseManageController extends BaseController {
      * @return save result
      */
     @RequestMapping(method = RequestMethod.POST, value = "/saveDbConfig")
-    public GeneralResponse saveDatabaseConfig(DatabaseConfig databaseConfig) {
+    public GeneralResponse saveDatabaseConfig(DataSourceConfig databaseConfig) {
         return execute(() -> databaseManageService.saveDatabaseConfig(databaseConfig));
     }
 
@@ -59,7 +59,7 @@ public class DatabaseManageController extends BaseController {
      * @return delete result
      */
     @RequestMapping(method = RequestMethod.POST, value = "/deleteDatabaseConfig")
-    public GeneralResponse deleteDatabaseConfig(DatabaseConfig databaseConfig) {
+    public GeneralResponse deleteDatabaseConfig(DataSourceConfig databaseConfig) {
         return execute(() -> databaseManageService.deleteDatabaseConfig(databaseConfig));
     }
 

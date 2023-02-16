@@ -4,7 +4,7 @@ import com.stewart.datatransport.annotation.DBLogic;
 import com.stewart.datatransport.enums.database.DatabaseType;
 import com.stewart.datatransport.logic.DatabaseLogic;
 import com.stewart.datatransport.pojo.vo.database.ConnectTryResult;
-import com.stewart.datatransport.pojo.vo.database.DatabaseConfig;
+import com.stewart.datatransport.pojo.vo.database.DataSourceConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -53,7 +53,7 @@ public class DatabaseOperation {
      * @param databaseConfig database configuration
      * @return connect result
      */
-    public ConnectTryResult tryConnection(DatabaseConfig databaseConfig) {
+    public ConnectTryResult tryConnection(DataSourceConfig databaseConfig) {
         DatabaseLogic databaseLogic = logicMap.get(databaseConfig.getDatabaseType());
         return databaseLogic.tryConnection(databaseConfig);
     }

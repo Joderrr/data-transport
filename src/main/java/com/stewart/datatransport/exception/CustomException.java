@@ -1,14 +1,18 @@
 package com.stewart.datatransport.exception;
 
 import com.stewart.datatransport.enums.ErrorCode;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @author stewart
  * @date 2023/1/20
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class CustomException extends Exception{
+@AllArgsConstructor
+public class CustomException extends Exception {
 
     /**
      * errorCode

@@ -3,6 +3,8 @@ package com.stewart.datatransport.pojo.vo.database;
 import com.stewart.datatransport.annotation.ParameterValid;
 import com.stewart.datatransport.enums.ValidType;
 import com.stewart.datatransport.enums.database.DatabaseType;
+import com.stewart.datatransport.pojo.persistent.DatabaseConfig;
+import com.stewart.datatransport.util.JacksonUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,7 +20,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DatabaseConfig {
+public class DataSourceConfig {
 
     /**
      * database config name
@@ -65,5 +67,18 @@ public class DatabaseConfig {
      */
     @ParameterValid(validType = ValidType.NOT_NULL)
     private List<AddressAndPort> address;
+
+    public DatabaseConfig toPersistent() {
+        return DatabaseConfig.builder()
+                .databaseUniqueId(databaseUniqueId)
+                .databaseType(databaseType.getName())
+                .instance(instance)
+                .databaseName(databaseName)
+                .name(name)
+                .username(username)
+                .password(password)
+                .address(JacksonUtil.toJsonString(address))
+                .build();
+    }
 
 }

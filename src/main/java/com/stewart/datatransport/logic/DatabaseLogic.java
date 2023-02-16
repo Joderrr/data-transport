@@ -1,7 +1,7 @@
 package com.stewart.datatransport.logic;
 
 import com.stewart.datatransport.pojo.vo.database.ConnectTryResult;
-import com.stewart.datatransport.pojo.vo.database.DatabaseConfig;
+import com.stewart.datatransport.pojo.vo.database.DataSourceConfig;
 
 /**
  * database logic interface
@@ -17,7 +17,7 @@ public interface DatabaseLogic {
      * @param databaseConfig    database connection configuration
      * @return  connect test result
      */
-    ConnectTryResult tryConnection(DatabaseConfig databaseConfig);
+    ConnectTryResult tryConnection(DataSourceConfig databaseConfig);
 
 
 }

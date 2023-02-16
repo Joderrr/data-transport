@@ -1,8 +1,9 @@
 package com.stewart.datatransport.service;
 
+import com.stewart.datatransport.exception.CustomException;
 import com.stewart.datatransport.pojo.vo.GeneralResponse;
 import com.stewart.datatransport.pojo.vo.database.ConnectTryResult;
-import com.stewart.datatransport.pojo.vo.database.DatabaseConfig;
+import com.stewart.datatransport.pojo.vo.database.DataSourceConfig;
 import com.stewart.datatransport.pojo.vo.database.DatabaseConfigPageQueryParam;
 
 /**
@@ -19,7 +20,7 @@ public interface DatabaseManageService {
      * @param databaseConfig database config
      * @return connection try result
      */
-    ConnectTryResult tryConnection(DatabaseConfig databaseConfig);
+    ConnectTryResult tryConnection(DataSourceConfig databaseConfig);
 
     /**
      * save database configuration
@@ -27,7 +28,7 @@ public interface DatabaseManageService {
      * @param databaseConfig database config
      * @return database config save result (success or not)
      */
-    GeneralResponse saveDatabaseConfig(DatabaseConfig databaseConfig);
+    GeneralResponse saveDatabaseConfig(DataSourceConfig databaseConfig);
 
     /**
      * delete database configuration
@@ -35,7 +36,16 @@ public interface DatabaseManageService {
      * @param databaseConfig database config
      * @return database config delete result (success or not)
      */
-    GeneralResponse deleteDatabaseConfig(DatabaseConfig databaseConfig);
+    GeneralResponse deleteDatabaseConfig(DataSourceConfig databaseConfig);
+
+    /**
+     * update database configuration
+     *
+     * @param databaseConfig    database config
+     * @return  database config update result (success or not)
+     * @throws CustomException before update, check datasource is in use or not
+     */
+    GeneralResponse updateDatabaseConfig(DataSourceConfig databaseConfig) throws CustomException;
 
     /**
      * page query for database configuration
