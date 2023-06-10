@@ -4,7 +4,7 @@ import com.stewart.datatransport.annotation.ParameterValid;
 import com.stewart.datatransport.enums.ErrorCode;
 import com.stewart.datatransport.enums.reflection.MethodType;
 import com.stewart.datatransport.exception.ValidException;
-import com.stewart.datatransport.pojo.vo.GeneralResponse;
+import com.stewart.datatransport.pojo.vo.base.GeneralResponse;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;

@@ -6,6 +6,9 @@ import com.stewart.datatransport.pojo.vo.database.ConnectTryResult;
 import com.stewart.datatransport.pojo.vo.database.DataSourceConfig;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * oracle operation
  *
@@ -17,6 +20,11 @@ import org.springframework.stereotype.Component;
 public class OracleLogic implements DatabaseLogic {
     @Override
     public ConnectTryResult tryConnection(DataSourceConfig databaseConfig) {
+        return null;
+    }
+
+    @Override
+    public List<Map<String, String>> executeQueryScript(DataSourceConfig dataSourceConfig, String script) {
         return null;
     }
 }

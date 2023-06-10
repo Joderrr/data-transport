@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * database basic operation
  * this class managed different database logics by logicMap
  * by using databaseType enum, we can get mysql/oracle logic from logicMap
- * then use DatabaseLogic interface's different implement to operate the database
+ * then use DatabaseLogic interface's different implementation to operate the database
  *
  * @author stewart
  * @date 2023/1/18
@@ -48,14 +49,26 @@ public class DatabaseOperation {
     }
 
     /**
-     * try connect to database by different type of database logic
+     * try to connect to database by different type of database logic
      *
-     * @param databaseConfig database configuration
+     * @param dataSourceConfig database configuration
      * @return connect result
      */
-    public ConnectTryResult tryConnection(DataSourceConfig databaseConfig) {
-        DatabaseLogic databaseLogic = logicMap.get(databaseConfig.getDatabaseType());
-        return databaseLogic.tryConnection(databaseConfig);
+    public ConnectTryResult tryConnection(DataSourceConfig dataSourceConfig) {
+        DatabaseLogic databaseLogic = logicMap.get(dataSourceConfig.getDatabaseType());
+        return databaseLogic.tryConnection(dataSourceConfig);
+    }
+
+    /**
+     * before create the data object, user need to make sure they query script will execute correctly
+     *
+     * @param dataSourceConfig  data source configuration
+     * @param script    query script
+     * @return  query result
+     */
+    public List<Map<String, String>> executeQueryScript(DataSourceConfig dataSourceConfig, String script){
+        DatabaseLogic databaseLogic = logicMap.get(dataSourceConfig.getDatabaseType());
+        return databaseLogic.executeQueryScript(dataSourceConfig, script);
     }
 
 }

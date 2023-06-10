@@ -1,6 +1,6 @@
 package com.stewart.datatransport.exception;
 
-import com.stewart.datatransport.pojo.vo.GeneralResponse;
+import com.stewart.datatransport.pojo.vo.base.GeneralResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;

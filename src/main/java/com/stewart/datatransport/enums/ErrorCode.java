@@ -29,7 +29,12 @@ public enum ErrorCode {
     /**
      * invalid operation
      */
-    INVALID_OPERATION(1002, "Invalid operation");
+    INVALID_OPERATION(1002, "Invalid operation"),
+
+    /**
+     * database connect failed
+     */
+    DATABASE_CONNECT_FAILED(2001, "get database connection failed");
 
     /**
      * constructor method

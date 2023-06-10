@@ -1,6 +1,6 @@
 package com.stewart.datatransport.service;
 
-import com.stewart.datatransport.pojo.vo.GeneralResponse;
+import com.stewart.datatransport.pojo.vo.base.GeneralResponse;
 
 import static com.stewart.datatransport.enums.ErrorCode.FAILURE;
 import static com.stewart.datatransport.enums.ErrorCode.SUCCESS;

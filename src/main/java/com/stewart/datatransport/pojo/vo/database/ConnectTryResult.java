@@ -1,6 +1,6 @@
 package com.stewart.datatransport.pojo.vo.database;
 
-import com.stewart.datatransport.pojo.vo.database.base.BaseResult;
+import com.stewart.datatransport.pojo.vo.base.BaseResult;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;

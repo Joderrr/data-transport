@@ -1,7 +1,10 @@
 package com.stewart.datatransport.pojo.vo.object;
 
 import com.stewart.datatransport.enums.object.DataType;
+import com.stewart.datatransport.pojo.persistent.DataObject;
+import com.stewart.datatransport.util.JacksonUtil;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,6 +19,7 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class DataObjectConfig {
 
     /**
@@ -29,9 +33,9 @@ public class DataObjectConfig {
     String objectUniqueId;
 
     /**
-     * related database's unique id
+     * related database's id
      */
-    String databaseUniqueId;
+    Long databaseId;
 
     /**
      * database's query sql script
@@ -42,5 +46,26 @@ public class DataObjectConfig {
      * fields from the result of query script
      */
     Map<String, DataType> fieldMap;
+
+    public DataObject toPersistent() {
+        return DataObject.builder()
+                .name(objectName)
+                .dataObjectUniqueId(objectUniqueId)
+                .datasourceId(databaseId)
+                .queryScript(queryScript)
+                .dataStructure(JacksonUtil.toJsonString(fieldMap))
+                .build();
+    }
+
+    public static DataObjectConfig readFromPersistent(DataObject dataObject){
+        return DataObjectConfig.builder()
+                .databaseId(dataObject.getDatasourceId())
+                .objectUniqueId(dataObject.getDataObjectUniqueId())
+                .fieldMap(JacksonUtil.fromJsonToObject(dataObject.getDataStructure(), Map.class))
+                .queryScript(dataObject.getQueryScript())
+                .objectName(dataObject.getName())
+                .build();
+    }
+
 
 }

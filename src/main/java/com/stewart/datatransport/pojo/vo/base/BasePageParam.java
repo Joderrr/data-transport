@@ -1,4 +1,4 @@
-package com.stewart.datatransport.pojo.vo;
+package com.stewart.datatransport.pojo.vo.base;
 
 import lombok.Data;
 

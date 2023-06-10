@@ -3,6 +3,8 @@ package com.stewart.datatransport.pojo.persistent;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Builder;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -15,6 +17,7 @@ import java.time.LocalDateTime;
  * @since 2023-02-16
  */
 @TableName("data_object")
+@Builder
 public class DataObject implements Serializable {
 
     private static final long serialVersionUID = 1L;

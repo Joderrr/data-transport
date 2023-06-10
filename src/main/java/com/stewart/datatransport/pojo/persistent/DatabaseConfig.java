@@ -61,9 +61,14 @@ public class DatabaseConfig implements Serializable {
     private String databaseName;
 
     /**
-     * json object of addresses
+     * ip addresses
      */
     private String address;
+
+    /**
+     * database port
+     */
+    private String port;
 
     /**
      * datasource create time
@@ -148,6 +153,14 @@ public class DatabaseConfig implements Serializable {
         this.address = address;
     }
 
+    public String getPort() {
+        return port;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
+    }
+
     public LocalDateTime getCreateTime() {
         return createTime;
     }
@@ -176,6 +189,7 @@ public class DatabaseConfig implements Serializable {
         ", password=" + password +
         ", databaseName=" + databaseName +
         ", address=" + address +
+        ", port=" + port +
         ", createTime=" + createTime +
         ", updateTime=" + updateTime +
         "}";

@@ -1,7 +1,7 @@
 package com.stewart.datatransport.service;
 
 import com.stewart.datatransport.exception.CustomException;
-import com.stewart.datatransport.pojo.vo.GeneralResponse;
+import com.stewart.datatransport.pojo.vo.base.GeneralResponse;
 import com.stewart.datatransport.pojo.vo.database.ConnectTryResult;
 import com.stewart.datatransport.pojo.vo.database.DataSourceConfig;
 import com.stewart.datatransport.pojo.vo.database.DatabaseConfigPageQueryParam;

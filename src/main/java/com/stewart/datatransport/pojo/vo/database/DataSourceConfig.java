@@ -4,12 +4,10 @@ import com.stewart.datatransport.annotation.ParameterValid;
 import com.stewart.datatransport.enums.ValidType;
 import com.stewart.datatransport.enums.database.DatabaseType;
 import com.stewart.datatransport.pojo.persistent.DatabaseConfig;
-import com.stewart.datatransport.util.JacksonUtil;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 /**
  * database config object, for save and edit database configuration
@@ -18,6 +16,7 @@ import java.util.List;
  * @date 2023/1/17
  */
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class DataSourceConfig {
@@ -63,10 +62,16 @@ public class DataSourceConfig {
     private String databaseName;
 
     /**
-     * address and port information
+     * ip address
      */
     @ParameterValid(validType = ValidType.NOT_NULL)
-    private List<AddressAndPort> address;
+    private String address;
+
+    /**
+     * port
+     */
+    @ParameterValid(validType = ValidType.NOT_NULL)
+    private String port;
 
     public DatabaseConfig toPersistent() {
         return DatabaseConfig.builder()
@@ -77,7 +82,22 @@ public class DataSourceConfig {
                 .name(name)
                 .username(username)
                 .password(password)
-                .address(JacksonUtil.toJsonString(address))
+                .address(address)
+                .port(port)
+                .build();
+    }
+
+    public static DataSourceConfig readFromPersistent(DatabaseConfig databaseConfig){
+        return DataSourceConfig.builder()
+                .databaseUniqueId(databaseConfig.getDatabaseUniqueId())
+                .databaseType(DatabaseType.getDatabaseTypeFromName(databaseConfig.getDatabaseType()))
+                .instance(databaseConfig.getInstance())
+                .databaseName(databaseConfig.getDatabaseName())
+                .name(databaseConfig.getName())
+                .username(databaseConfig.getUsername())
+                .password(databaseConfig.getPassword())
+                .address(databaseConfig.getAddress())
+                .port(databaseConfig.getPort())
                 .build();
     }
 

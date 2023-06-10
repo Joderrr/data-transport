@@ -2,8 +2,9 @@ package com.stewart.datatransport.logic;
 
 import com.stewart.datatransport.annotation.DBLogic;
 import com.stewart.datatransport.constant.DatabaseConstants;
+import com.stewart.datatransport.enums.ErrorCode;
 import com.stewart.datatransport.enums.database.DatabaseType;
-import com.stewart.datatransport.pojo.vo.database.AddressAndPort;
+import com.stewart.datatransport.exception.CustomException;
 import com.stewart.datatransport.pojo.vo.database.ConnectTryResult;
 import com.stewart.datatransport.pojo.vo.database.DataSourceConfig;
 import lombok.extern.slf4j.Slf4j;
@@ -11,10 +12,14 @@ import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.stewart.datatransport.util.DatabaseConfigUtil.urlAssemble;
 
@@ -29,20 +34,43 @@ import static com.stewart.datatransport.util.DatabaseConfigUtil.urlAssemble;
 @DBLogic(name = "mysql", type = DatabaseType.MySQL)
 public class MysqlLogic implements DatabaseLogic {
 
+    /**
+     * @see DatabaseLogic#tryConnection(DataSourceConfig)
+     */
     @Override
-    public ConnectTryResult tryConnection(DataSourceConfig databaseConfig) {
-        boolean executeResult = true;
+    public ConnectTryResult tryConnection(DataSourceConfig dataSourceConfig) {
+        boolean executeResult;
         String executeMessage = "connect success";
         try {
-            List<String> configurationUrls = getConfigurationUrls(databaseConfig);
-            for (String configurationUrl : configurationUrls) {
-                executeResult = executeResult && connectTest(configurationUrl, databaseConfig.getUsername(), databaseConfig.getPassword());
-            }
+            String configurationUrl = getConfigurationUrls(dataSourceConfig);
+            executeResult = connectTest(configurationUrl, dataSourceConfig.getUsername(), dataSourceConfig.getPassword());
         } catch (Exception e) {
             executeResult = false;
             executeMessage = "Exception has been thrown while database connection test, exception : " + e.getMessage();
         }
         return new ConnectTryResult(executeResult, executeMessage);
+    }
+
+    @Override
+    public List<Map<String, String>> executeQueryScript(DataSourceConfig dataSourceConfig, String script) {
+        List<Map<String,String>> results = new ArrayList<>();
+        try{
+            List<String> queryColumn = resolveQueryColumn(script);
+            String configurationUrl = getConfigurationUrls(dataSourceConfig);
+            Connection connection = getConnection(configurationUrl, dataSourceConfig.getUsername(), dataSourceConfig.getPassword());
+            PreparedStatement preparedStatement = connection.prepareStatement(script);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()){
+                Map<String, String> row = new HashMap<>(16);
+                for (String col : queryColumn) {
+                    row.put(col, resultSet.getString(col));
+                }
+                results.add(row);
+            }
+            return results;
+        } catch (CustomException | SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -57,11 +85,10 @@ public class MysqlLogic implements DatabaseLogic {
     private boolean connectTest(String url, String username, String password) throws SQLException {
         Connection connection = null;
         try {
-            Class.forName(DatabaseConstants.MYSQL_DRIVER_NAME);
-            connection = DriverManager.getConnection(url, username, password);
+            connection = getConnection(url, username, password);
             Statement statement = connection.createStatement();
             return statement.execute(DatabaseConstants.MYSQL_CONNECT_TEST_SQL);
-        }catch (ClassNotFoundException | SQLException e){
+        }catch (SQLException | CustomException e){
             log.error("database connection test failed, because of {}", e.getMessage());
             return false;
         }finally {
@@ -77,13 +104,34 @@ public class MysqlLogic implements DatabaseLogic {
      * @param databaseConfig database configuration
      * @return resolved url address
      */
-    private List<String> getConfigurationUrls(DataSourceConfig databaseConfig) {
-        List<String> urlList = new ArrayList<>();
+    private String getConfigurationUrls(DataSourceConfig databaseConfig) {
         String databaseName = databaseConfig.getDatabaseName();
-        List<AddressAndPort> addresses = databaseConfig.getAddress();
-        for (AddressAndPort address : addresses) {
-            urlList.add(urlAssemble(databaseConfig.getDatabaseType(), address.getIp(), address.getPort(), databaseName));
+        return urlAssemble(databaseConfig.getDatabaseType(), databaseConfig.getAddress(), databaseConfig.getPort(), databaseName);
+    }
+
+    private Connection getConnection(String url, String username, String password) throws CustomException {
+        try {
+            Class.forName(DatabaseConstants.MYSQL_DRIVER_NAME);
+            return DriverManager.getConnection(url, username, password);
+        }catch (ClassNotFoundException | SQLException e){
+            log.error("database connect failed, because of {}", e.getMessage());
+            throw new CustomException(ErrorCode.DATABASE_CONNECT_FAILED, "try to get database connection failed");
         }
-        return urlList;
+    }
+
+    private List<String> resolveQueryColumn(String queryScript){
+        List<String> columns = new ArrayList<>();
+        String[] splitColumns = queryScript.split(",");
+        for (int i = 0; i < splitColumns.length; i++) {
+            if(i == 0){
+                columns.add(splitColumns[i].replace("select", "").replaceAll(" ",""));
+            } else if(i == splitColumns.length - 1) {
+                //the last column are beside of the 'from', so we replace all whitespaces, then split by from and get first
+                columns.add(splitColumns[i].replaceAll(" ","").split("from")[0]);
+            } else {
+                columns.add(splitColumns[i].replaceAll(" ",""));
+            }
+        }
+        return columns;
     }
 }

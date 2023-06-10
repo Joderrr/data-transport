@@ -9,7 +9,7 @@ import com.stewart.datatransport.mapper.DataObjectMapper;
 import com.stewart.datatransport.mapper.DatabaseConfigMapper;
 import com.stewart.datatransport.pojo.persistent.DataObject;
 import com.stewart.datatransport.pojo.persistent.DatabaseConfig;
-import com.stewart.datatransport.pojo.vo.GeneralResponse;
+import com.stewart.datatransport.pojo.vo.base.GeneralResponse;
 import com.stewart.datatransport.pojo.vo.database.ConnectTryResult;
 import com.stewart.datatransport.pojo.vo.database.DataSourceConfig;
 import com.stewart.datatransport.pojo.vo.database.DatabaseConfigPageQueryParam;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-
 import java.util.List;
 
 /**
