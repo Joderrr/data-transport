@@ -32,4 +32,14 @@ public interface DatabaseLogic {
     List<Map<String, String>> executeQueryScript(DataSourceConfig dataSourceConfig, String script);
 
 
+    /**
+     * execute query script of data, with the condition map
+     *
+     * @param dataSourceConfig  database connection configuration
+     * @param script            query script
+     * @param condition         query condition
+     * @return                  query result
+     */
+    List<Map<String, String>> executeQueryScript(DataSourceConfig dataSourceConfig, String script, Map<String, String> condition);
+
 }

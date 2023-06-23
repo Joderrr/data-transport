@@ -71,4 +71,17 @@ public class DatabaseOperation {
         return databaseLogic.executeQueryScript(dataSourceConfig, script);
     }
 
+    /**
+     * execute query script with query conditions
+     *
+     * @param dataSourceConfig      datasource configuration
+     * @param script                query script
+     * @param condition             query condition
+     * @return                      query result
+     */
+    public List<Map<String, String>> executeQueryScript(DataSourceConfig dataSourceConfig, String script, Map<String,String> condition){
+        DatabaseLogic databaseLogic = logicMap.get(dataSourceConfig.getDatabaseType());
+        return databaseLogic.executeQueryScript(dataSourceConfig, script, condition);
+    }
+
 }

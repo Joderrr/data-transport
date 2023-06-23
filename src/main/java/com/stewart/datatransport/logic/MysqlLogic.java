@@ -73,6 +73,28 @@ public class MysqlLogic implements DatabaseLogic {
         }
     }
 
+    @Override
+    public List<Map<String, String>> executeQueryScript(DataSourceConfig dataSourceConfig, String script, Map<String, String> condition) {
+        List<Map<String,String>> results = new ArrayList<>();
+        try{
+            List<String> queryColumn = resolveQueryColumn(script);
+            String configurationUrl = getConfigurationUrls(dataSourceConfig);
+            Connection connection = getConnection(configurationUrl, dataSourceConfig.getUsername(), dataSourceConfig.getPassword());
+            PreparedStatement preparedStatement = connection.prepareStatement(resolveCondition(script, condition));
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()){
+                Map<String, String> row = new HashMap<>(16);
+                for (String col : queryColumn) {
+                    row.put(col, resultSet.getString(col));
+                }
+                results.add(row);
+            }
+            return results;
+        } catch (CustomException | SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * connect test method
      *
@@ -133,5 +155,14 @@ public class MysqlLogic implements DatabaseLogic {
             }
         }
         return columns;
+    }
+
+    private String resolveCondition(String queryScript, Map<String, String> condition){
+        String tempSql = queryScript;
+        for (Map.Entry<String, String> entry : condition.entrySet()) {
+            String replaceKey = "{" + entry.getKey() + "}";
+            tempSql = queryScript.replace(replaceKey, entry.getValue());
+        }
+        return tempSql;
     }
 }

@@ -1,6 +1,8 @@
 package com.stewart.datatransport.pojo.persistent;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Builder;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -13,6 +15,7 @@ import java.time.LocalDateTime;
  * @since 2023-02-16
  */
 @TableName("data_set")
+@Builder
 public class DataSet implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -33,6 +36,11 @@ public class DataSet implements Serializable {
      * data objects that data set includes
      */
     private String dataObjects;
+
+    /**
+     * data set configuration metadata
+     */
+    private String metadata;
 
     /**
      * data set create time
@@ -75,6 +83,14 @@ public class DataSet implements Serializable {
 
     public void setDataObjects(String dataObjects) {
         this.dataObjects = dataObjects;
+    }
+
+    public String getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(String metadata) {
+        this.metadata = metadata;
     }
 
     public LocalDateTime getCreateTime() {

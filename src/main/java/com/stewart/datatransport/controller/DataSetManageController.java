@@ -1,7 +1,12 @@
 package com.stewart.datatransport.controller;
 
+import com.stewart.datatransport.pojo.vo.base.GeneralResponse;
+import com.stewart.datatransport.pojo.vo.dataset.DataSetConfig;
+import com.stewart.datatransport.service.DataSetManageService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
 
 /**
  * data set management
@@ -11,5 +16,48 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/dataset/manage")
-public class DataSetManageController {
+public class DataSetManageController extends BaseController {
+
+    @Resource
+    DataSetManageService dataSetManageService;
+
+    /**
+     * save dataset configuration
+     *
+     * @param dataSetConfig    dataSet Configuration
+     * @return     save result
+     */
+    public GeneralResponse saveDataSet(DataSetConfig dataSetConfig){
+        return execute(() -> dataSetManageService.saveDataSet(dataSetConfig));
+    }
+
+    /**
+     * Delete DataSet configuration
+     *
+     * @param dataSetUniqueId  delete DataSet configuration
+     * @return    delete result
+     */
+    public GeneralResponse deleteDataSet(String dataSetUniqueId){
+        return execute(() -> dataSetManageService.deleteDataSet(dataSetUniqueId));
+    }
+
+    /**
+     * update dataSet configuration
+     *
+     * @param dataSetConfig     dataSet configuration
+     * @return      update result
+     */
+    public GeneralResponse updateDataSet(DataSetConfig dataSetConfig){
+        return execute(() -> dataSetManageService.updateDataSet(dataSetConfig));
+    }
+
+    /**
+     * query dataset by dataset configuration
+     *
+     * @param dataSetConfig   dataSet query param
+     * @return  query result
+     */
+    public GeneralResponse queryDataSet(DataSetConfig dataSetConfig){
+        return execute(() -> dataSetManageService.queryDataSet(dataSetConfig));
+    }
 }
