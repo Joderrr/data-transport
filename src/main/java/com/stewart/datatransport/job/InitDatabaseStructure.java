@@ -20,6 +20,8 @@ import java.sql.SQLException;
  * if initDatabaseIfNotExist config values true, once program has running successful,
  * database and table will create automatically
  *
+ * Not important, delay implement, all code's optimize should after graduate.
+ *
  * @author stewart
  * @date 2023/1/21
  */

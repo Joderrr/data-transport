@@ -95,6 +95,20 @@ public class MysqlLogic implements DatabaseLogic {
         }
     }
 
+    @Override
+    public boolean executeInsertScript(DataSourceConfig dataSourceConfig, String script) {
+        List<Map<String,String>> results = new ArrayList<>();
+        try{
+            List<String> queryColumn = resolveQueryColumn(script);
+            String configurationUrl = getConfigurationUrls(dataSourceConfig);
+            Connection connection = getConnection(configurationUrl, dataSourceConfig.getUsername(), dataSourceConfig.getPassword());
+            PreparedStatement preparedStatement = connection.prepareStatement(script);
+            return preparedStatement.execute();
+        } catch (CustomException | SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * connect test method
      *

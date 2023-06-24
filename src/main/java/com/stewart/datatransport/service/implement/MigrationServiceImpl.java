@@ -1,11 +1,13 @@
 package com.stewart.datatransport.service.implement;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.stewart.datatransport.component.DatabaseOperation;
 import com.stewart.datatransport.mapper.DataSetMapper;
 import com.stewart.datatransport.mapper.DatabaseConfigMapper;
 import com.stewart.datatransport.pojo.dto.MigrationData;
+import com.stewart.datatransport.pojo.persistent.DataObject;
 import com.stewart.datatransport.pojo.persistent.DataSet;
 import com.stewart.datatransport.pojo.persistent.DatabaseConfig;
 import com.stewart.datatransport.pojo.vo.database.DataSourceConfig;
@@ -22,9 +24,11 @@ import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Migration Service Implementation
@@ -149,8 +153,96 @@ public class MigrationServiceImpl extends BaseService implements MigrationServic
     }
 
 
+    /**
+     * @see MigrationService#importMigrationPackage(DataSourceConfig, MultipartFile)
+     */
     @Override
     public boolean importMigrationPackage(DataSourceConfig dataSourceConfig, MultipartFile file) {
-        return false;
+        try {
+            String oriStr = new String(file.getBytes());
+            MigrationData migrationData = JSONObject.parseObject(oriStr, MigrationData.class);
+            if(migrationData == null){
+                return false;
+            }
+            DataSetConfig dataSetConfig = migrationData.getDataSetConfig();
+            Map<String, List<Map<String, String>>> originData = migrationData.getMigrationData();
+            DataRelations dataRelations = dataSetConfig.getDataRelations();
+            DataObject root = dataRelations.getRoot();
+            List<Relation> children = dataRelations.getChildren();
+            List<DataObject> dataObjects = new ArrayList<>();
+            dataObjects.add(root);
+            getDataObjects(children, dataObjects);
+            Map<String, List<String>> sqlMap = resolveSQLMap(originData);
+            for (List<String> value : sqlMap.values()) {
+                value.forEach(v -> databaseOperation.executeInsertScript(
+                        dataSourceConfig, v));
+            }
+            return true;
+        } catch (Exception e) {
+            log.error("An exception occurs while parsing file to MigrationData, exception : {}", e.getMessage(), e);
+            return false;
+        }
     }
+
+    /**
+     * get data objects from relations by using recursion method
+     *
+     * @param relations     object relationship model
+     * @param dataObjects   data object collection
+     */
+    private void getDataObjects(List<Relation> relations, List<DataObject> dataObjects){
+        if(relations == null || relations.isEmpty()){
+            return;
+        }
+        for (Relation relation : relations) {
+            dataObjects.add(relation.getSelf());
+            if(relation.getChildren() != null && !relation.getChildren().isEmpty()){
+                getDataObjects(relation.getChildren(), dataObjects);
+            }
+        }
+    }
+
+    /**
+     * resolve sql string from origin data structure and column values
+     *
+     * @param data      origin data
+     * @return          resolved sql
+     */
+    private Map<String, List<String>> resolveSQLMap(Map<String, List<Map<String, String>>> data){
+        Map<String, List<String>> sqlMap = new HashMap<>();
+        data.entrySet().stream().forEach(entry -> {
+            String objectName = entry.getKey();
+            List<Map<String,String>> values = entry.getValue();
+            List<String> sqls = values.stream().map(v -> sqlFactory(objectName, v)).collect(Collectors.toList());
+            sqlMap.put(objectName, sqls);
+        });
+        return sqlMap;
+    }
+
+    /**
+     * generate sql from param and value map
+     *
+     * @param objectName    target object name , like table_name
+     * @param value         target object key and values
+     * @return              resolved sql
+     */
+    private String sqlFactory(String objectName, Map<String,String> value){
+        String preStr = "insert into " + objectName ;
+        String middile = " values";
+        StringBuilder front = new StringBuilder("(");
+        StringBuilder end = new StringBuilder("(");
+        ArrayList<Map.Entry<String, String>> entries = new ArrayList<>(value.entrySet());
+        for (int i = 0; i < entries.size(); i++) {
+            if(i > 0){
+                front.append(",");
+                end.append(",");
+            }
+            front.append(entries.get(i).getKey());
+            end.append(entries.get(i).getValue());
+        }
+        front.append(")");
+        end.append(")");
+        return preStr + front + middile + end;
+    }
+
 }

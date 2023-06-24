@@ -42,4 +42,12 @@ public interface DatabaseLogic {
      */
     List<Map<String, String>> executeQueryScript(DataSourceConfig dataSourceConfig, String script, Map<String, String> condition);
 
+    /**
+     * execute insert script, without params
+     *
+     * @param dataSourceConfig  database connection configuration
+     * @param script            insert script
+     * @return                  insert result
+     */
+    boolean executeInsertScript(DataSourceConfig dataSourceConfig, String script);
 }

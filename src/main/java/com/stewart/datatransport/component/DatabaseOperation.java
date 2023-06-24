@@ -84,4 +84,9 @@ public class DatabaseOperation {
         return databaseLogic.executeQueryScript(dataSourceConfig, script, condition);
     }
 
+    public boolean executeInsertScript(DataSourceConfig dataSourceConfig, String script){
+        DatabaseLogic databaseLogic = logicMap.get(dataSourceConfig.getDatabaseType());
+        return databaseLogic.executeInsertScript(dataSourceConfig, script);
+    }
+
 }

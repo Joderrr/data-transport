@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * oracle operation, not implemented
+ * oracle operation
+ * not implemented yet
  *
  * @author stewart
  * @date 2023/1/17
@@ -31,5 +32,10 @@ public class OracleLogic implements DatabaseLogic {
     @Override
     public List<Map<String, String>> executeQueryScript(DataSourceConfig dataSourceConfig, String script, Map<String, String> condition) {
         return null;
+    }
+
+    @Override
+    public boolean executeInsertScript(DataSourceConfig dataSourceConfig, String script) {
+        return false;
     }
 }
