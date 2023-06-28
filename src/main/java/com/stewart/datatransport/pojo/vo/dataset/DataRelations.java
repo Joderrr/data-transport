@@ -1,8 +1,9 @@
 package com.stewart.datatransport.pojo.vo.dataset;
 
 import com.stewart.datatransport.pojo.persistent.DataObject;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -13,10 +14,12 @@ import java.util.List;
  * @date 2023/6/11
  */
 @Data
-@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class DataRelations {
 
     /**
+     * root uuid
      * a DataSet need to have a root DataObject
      * root object is the "main method" to this dataSet
      * user need to write a sql script to get the root object

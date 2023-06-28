@@ -44,12 +44,12 @@ public class DatabaseManageController extends BaseController {
     /**
      * save database configuration
      *
-     * @param databaseConfig database configuration
+     * @param dataSourceConfig database configuration
      * @return save result
      */
     @RequestMapping(method = RequestMethod.POST, value = "/saveDbConfig")
-    public GeneralResponse saveDatabaseConfig(DataSourceConfig databaseConfig) {
-        return execute(() -> databaseManageService.saveDatabaseConfig(databaseConfig));
+    public GeneralResponse saveDatabaseConfig(@RequestBody DataSourceConfig dataSourceConfig) {
+        return execute(() -> databaseManageService.saveDatabaseConfig(dataSourceConfig));
     }
 
     /**
@@ -58,8 +58,8 @@ public class DatabaseManageController extends BaseController {
      * @param databaseConfig database configuration
      * @return delete result
      */
-    @RequestMapping(method = RequestMethod.POST, value = "/deleteDatabaseConfig")
-    public GeneralResponse deleteDatabaseConfig(DataSourceConfig databaseConfig) {
+    @RequestMapping(method = RequestMethod.DELETE, value = "/deleteDatabaseConfig")
+    public GeneralResponse deleteDatabaseConfig(@RequestBody DataSourceConfig databaseConfig) {
         return execute(() -> databaseManageService.deleteDatabaseConfig(databaseConfig));
     }
 
@@ -70,7 +70,7 @@ public class DatabaseManageController extends BaseController {
      * @return query result
      */
     @RequestMapping(method = RequestMethod.POST, value = "/pageQuery")
-    public GeneralResponse searchDatabaseConfig(DatabaseConfigPageQueryParam queryParam) {
+    public GeneralResponse searchDatabaseConfig(@RequestBody DatabaseConfigPageQueryParam queryParam) {
         return execute(() -> databaseManageService.queryDatabaseConfigPage(queryParam));
     }
 }

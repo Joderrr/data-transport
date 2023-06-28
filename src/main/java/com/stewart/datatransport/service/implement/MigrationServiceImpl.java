@@ -10,6 +10,7 @@ import com.stewart.datatransport.pojo.dto.MigrationData;
 import com.stewart.datatransport.pojo.persistent.DataObject;
 import com.stewart.datatransport.pojo.persistent.DataSet;
 import com.stewart.datatransport.pojo.persistent.DatabaseConfig;
+import com.stewart.datatransport.pojo.vo.base.GeneralResponse;
 import com.stewart.datatransport.pojo.vo.database.DataSourceConfig;
 import com.stewart.datatransport.pojo.vo.dataset.DataRelations;
 import com.stewart.datatransport.pojo.vo.dataset.DataSetConfig;
@@ -60,7 +61,7 @@ public class MigrationServiceImpl extends BaseService implements MigrationServic
         DataRelations dataRelations = dataSetConfig.getDataRelations();
         DatabaseConfig databaseConfig = databaseConfigMapper.selectOne(
                 new LambdaQueryWrapper<DatabaseConfig>()
-                        .eq(DatabaseConfig::getDatabaseUniqueId, dataRelations.getRoot().getDatasourceId()));
+                        .eq(DatabaseConfig::getId, dataRelations.getRoot().getDatasourceId()));
         List<Map<String, String>> rootQuery = databaseOperation.executeQueryScript(
                 DataSourceConfig.readFromPersistent(databaseConfig), dataRelations.getRoot().getQueryScript(), condition);
         if(rootQuery.size() != 1){
@@ -73,7 +74,7 @@ public class MigrationServiceImpl extends BaseService implements MigrationServic
         List<Relation> children = dataRelations.getChildren();
         //make a collection to collect objects
         Map<String,List<Map<String, String>>> allData = new HashMap<>();
-        allData.put(dataRelations.getRoot().getName(), rootQuery);
+        allData.put(dataRelations.getRoot().getTableName(), rootQuery);
         //get all data objects by root, use recursion
         getDatas(children, root, allData);
 
@@ -113,7 +114,7 @@ public class MigrationServiceImpl extends BaseService implements MigrationServic
             String script = target.getSelf().getQueryScript();
             DatabaseConfig targetDbConfig = databaseConfigMapper.selectOne(
                     new LambdaQueryWrapper<DatabaseConfig>()
-                            .eq(DatabaseConfig::getDatabaseUniqueId, target.getSelf().getDatasourceId()));
+                            .eq(DatabaseConfig::getId, target.getSelf().getDatasourceId()));
             Map<String, List<String>> relations= target.getRelationShip();
             for (Map.Entry<String, List<String>> conditions : relations.entrySet()) {
                 String value = current.get(conditions.getKey());
@@ -122,7 +123,7 @@ public class MigrationServiceImpl extends BaseService implements MigrationServic
             }
             List<Map<String, String>> results = databaseOperation.executeQueryScript(
                     DataSourceConfig.readFromPersistent(targetDbConfig), script);
-            String targetName = target.getSelf().getName();
+            String targetName = target.getSelf().getTableName();
             if(allDatas.containsKey(targetName)){
                 List<Map<String,String>> oldData = allDatas.get(targetName);
                 oldData.addAll(results);
@@ -146,8 +147,9 @@ public class MigrationServiceImpl extends BaseService implements MigrationServic
      */
     private String resolveSql(String sql, String value, List<String> keys){
         for (String key : keys) {
-            String keyName = "{" + key + "}";
-            sql = sql.replace(keyName, value);
+            String keyName = "#{" + key + "}";
+            String keyValue = "'" + value + "'";
+            sql = sql.replace(keyName, keyValue);
         }
         return sql;
     }
@@ -157,12 +159,12 @@ public class MigrationServiceImpl extends BaseService implements MigrationServic
      * @see MigrationService#importMigrationPackage(DataSourceConfig, MultipartFile)
      */
     @Override
-    public boolean importMigrationPackage(DataSourceConfig dataSourceConfig, MultipartFile file) {
+    public GeneralResponse importMigrationPackage(DataSourceConfig dataSourceConfig, MultipartFile file) {
         try {
             String oriStr = new String(file.getBytes());
             MigrationData migrationData = JSONObject.parseObject(oriStr, MigrationData.class);
             if(migrationData == null){
-                return false;
+                return generateResponseObject(false);
             }
             DataSetConfig dataSetConfig = migrationData.getDataSetConfig();
             Map<String, List<Map<String, String>>> originData = migrationData.getMigrationData();
@@ -177,10 +179,10 @@ public class MigrationServiceImpl extends BaseService implements MigrationServic
                 value.forEach(v -> databaseOperation.executeInsertScript(
                         dataSourceConfig, v));
             }
-            return true;
+            return generateResponseObject(true);
         } catch (Exception e) {
             log.error("An exception occurs while parsing file to MigrationData, exception : {}", e.getMessage(), e);
-            return false;
+            return generateResponseObject(false);
         }
     }
 
@@ -238,10 +240,10 @@ public class MigrationServiceImpl extends BaseService implements MigrationServic
                 end.append(",");
             }
             front.append(entries.get(i).getKey());
-            end.append(entries.get(i).getValue());
+            end.append("'").append(entries.get(i).getValue()).append("'");
         }
-        front.append(")");
-        end.append(")");
+        front.append(") ");
+        end.append(");");
         return preStr + front + middile + end;
     }
 

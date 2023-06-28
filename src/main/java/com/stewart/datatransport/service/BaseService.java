@@ -2,6 +2,8 @@ package com.stewart.datatransport.service;
 
 import com.stewart.datatransport.pojo.vo.base.GeneralResponse;
 
+import java.util.UUID;
+
 import static com.stewart.datatransport.enums.ErrorCode.FAILURE;
 import static com.stewart.datatransport.enums.ErrorCode.SUCCESS;
 
@@ -12,6 +14,12 @@ import static com.stewart.datatransport.enums.ErrorCode.SUCCESS;
  * @date 2023/2/16
  */
 public class BaseService {
+
+    protected String generateUuid(){
+        String originalUuid = UUID.randomUUID().toString();
+        String finalUuid = originalUuid.replace("-", "");
+        return finalUuid;
+    }
 
     protected GeneralResponse generateResponseObject(boolean success, Object successContent, Object failContent) {
         if (success) {
@@ -30,7 +38,7 @@ public class BaseService {
     }
 
     protected GeneralResponse generateSuccessfulResponseObject(Object content) {
-        return GeneralResponse.build(SUCCESS.getCode(), SUCCESS.getMessage());
+        return GeneralResponse.build(SUCCESS.getCode(), SUCCESS.getMessage(), content);
     }
 
 }

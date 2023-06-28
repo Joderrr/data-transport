@@ -1,6 +1,7 @@
 package com.stewart.datatransport.service.implement;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.stewart.datatransport.component.DatabaseOperation;
 import com.stewart.datatransport.enums.ErrorCode;
 import com.stewart.datatransport.exception.CustomException;
@@ -62,8 +63,9 @@ public class DataObjectManageServiceImpl extends BaseService implements DataObje
      */
     @Override
     public GeneralResponse saveDataObject(DataObjectConfig configuration) {
+        configuration.setObjectUniqueId(generateUuid());
         int insert = dataObjectMapper.insert(configuration.toPersistent());
-        return generateResponseObject(insert > 0, "data object insert success", "data object insert failure");
+        return generateResponseObject(insert > 0, configuration, "data object insert failure");
     }
 
     /**
@@ -73,7 +75,7 @@ public class DataObjectManageServiceImpl extends BaseService implements DataObje
     public GeneralResponse updateDataObject(DataObjectConfig configuration) throws CustomException {
         checkDataObjectIsInUse(configuration.getObjectUniqueId());
         int update = dataObjectMapper.update(configuration.toPersistent(), new LambdaQueryWrapper<DataObject>().eq(DataObject::getDataObjectUniqueId, configuration.getObjectUniqueId()));
-        return generateResponseObject(update > 0, "data object update success", "data object update failure");
+        return generateResponseObject(update > 0, configuration, "data object update failure");
     }
 
     /**
@@ -93,16 +95,21 @@ public class DataObjectManageServiceImpl extends BaseService implements DataObje
     public GeneralResponse queryDataObject(DataObjectConfigPageQueryParam queryParam) {
         LambdaQueryWrapper<DataObject> wrapper = new LambdaQueryWrapper<>();
         DataObjectConfig doc = queryParam.getQueryParam();
-        if(doc.getObjectUniqueId() != null){
+        if(doc.getObjectUniqueId() != null && !doc.getObjectUniqueId().isEmpty()){
             wrapper.eq(DataObject::getDataObjectUniqueId, doc.getObjectUniqueId());
         }
-        if(doc.getObjectName() != null){
+        if(doc.getObjectName() != null && !doc.getObjectName().isEmpty()){
             wrapper.like(DataObject::getName, doc.getObjectName());
         }
         if(doc.getDatabaseId() != null) {
             wrapper.eq(DataObject::getDatasourceId, doc.getDatabaseId());
         }
-        return generateSuccessfulResponseObject(dataObjectMapper.selectList(wrapper));
+        return generateSuccessfulResponseObject(
+                dataObjectMapper.selectPage(
+                        new Page<>(queryParam.getPageNum(), queryParam.getPageSize()),
+                        wrapper
+                )
+        );
     }
 
     private void checkDataObjectIsInUse(String uniqueId) throws CustomException {

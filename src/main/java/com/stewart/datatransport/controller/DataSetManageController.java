@@ -3,7 +3,9 @@ package com.stewart.datatransport.controller;
 import com.stewart.datatransport.pojo.vo.base.GeneralResponse;
 import com.stewart.datatransport.pojo.vo.dataset.DataSetConfig;
 import com.stewart.datatransport.service.DataSetManageService;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -27,7 +29,8 @@ public class DataSetManageController extends BaseController {
      * @param dataSetConfig    dataSet Configuration
      * @return     save result
      */
-    public GeneralResponse saveDataSet(DataSetConfig dataSetConfig){
+    @RequestMapping(method = RequestMethod.POST, value = "/saveDataSet")
+    public GeneralResponse saveDataSet(@RequestBody DataSetConfig dataSetConfig){
         return execute(() -> dataSetManageService.saveDataSet(dataSetConfig));
     }
 
@@ -37,6 +40,7 @@ public class DataSetManageController extends BaseController {
      * @param dataSetUniqueId  delete DataSet configuration
      * @return    delete result
      */
+    @RequestMapping(method = RequestMethod.DELETE, value = "/deleteDataSet")
     public GeneralResponse deleteDataSet(String dataSetUniqueId){
         return execute(() -> dataSetManageService.deleteDataSet(dataSetUniqueId));
     }
@@ -47,7 +51,8 @@ public class DataSetManageController extends BaseController {
      * @param dataSetConfig     dataSet configuration
      * @return      update result
      */
-    public GeneralResponse updateDataSet(DataSetConfig dataSetConfig){
+    @RequestMapping(method = RequestMethod.PUT, value = "/updateDataSet")
+    public GeneralResponse updateDataSet(@RequestBody DataSetConfig dataSetConfig){
         return execute(() -> dataSetManageService.updateDataSet(dataSetConfig));
     }
 
@@ -57,7 +62,8 @@ public class DataSetManageController extends BaseController {
      * @param dataSetConfig   dataSet query param
      * @return  query result
      */
-    public GeneralResponse queryDataSet(DataSetConfig dataSetConfig){
+    @RequestMapping(method = RequestMethod.POST, value = "/queryDataSets")
+    public GeneralResponse queryDataSet(@RequestBody DataSetConfig dataSetConfig){
         return execute(() -> dataSetManageService.queryDataSet(dataSetConfig));
     }
 }

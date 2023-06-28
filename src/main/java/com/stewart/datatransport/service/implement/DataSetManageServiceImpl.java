@@ -28,8 +28,9 @@ public class DataSetManageServiceImpl extends BaseService implements DataSetMana
      */
     @Override
     public GeneralResponse saveDataSet(DataSetConfig dataSetConfig) {
+        dataSetConfig.setDataSetUniqueId(generateUuid());
         int insert = dataSetMapper.insert(dataSetConfig.toPersistent());
-        return generateResponseObject(insert > 0, "data set insert success", "data set insert failure");
+        return generateResponseObject(insert > 0, dataSetConfig, "data set insert failure");
     }
 
     /**
@@ -49,7 +50,7 @@ public class DataSetManageServiceImpl extends BaseService implements DataSetMana
     public GeneralResponse updateDataSet(DataSetConfig dataSetConfig) {
         int update = dataSetMapper.update(dataSetConfig.toPersistent(), new LambdaQueryWrapper<DataSet>()
                 .eq(DataSet::getDataSetUniqueId, dataSetConfig.getDataSetUniqueId()));
-        return generateResponseObject(update > 0, "data set update success", "data set update failure");
+        return generateResponseObject(update > 0, dataSetConfig, "data set update failure");
     }
 
     /**

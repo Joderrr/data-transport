@@ -1,5 +1,6 @@
 package com.stewart.datatransport.pojo.vo.database;
 
+import com.stewart.datatransport.pojo.persistent.DatabaseConfig;
 import com.stewart.datatransport.pojo.vo.base.BasePageParam;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,11 +13,34 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class DatabaseConfigPageQueryParam extends BasePageParam{
+public class DatabaseConfigPageQueryParam extends BasePageParam {
 
     /**
      * query parameter
      */
-    DataSourceConfig queryParam;
+    DataSourceQueryParam queryParam;
+
+    @Data
+    public class DataSourceQueryParam {
+
+        /**
+         * database config name
+         */
+        private String name;
+
+        /**
+         * ip address
+         */
+        private String address;
+
+        public DatabaseConfig toQuery() {
+            DatabaseConfig databaseConfig = DatabaseConfig.builder()
+                    .databaseName(this.getName())
+                    .address(this.getAddress())
+                    .build();
+            return databaseConfig;
+        }
+
+    }
 
 }

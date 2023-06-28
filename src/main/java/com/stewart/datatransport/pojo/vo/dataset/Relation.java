@@ -1,7 +1,9 @@
 package com.stewart.datatransport.pojo.vo.dataset;
 
 import com.stewart.datatransport.pojo.persistent.DataObject;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Map;
@@ -15,6 +17,8 @@ import java.util.Map;
  * @date 2023/6/11
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Relation {
 
     /**

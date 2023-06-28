@@ -51,9 +51,10 @@ public class DatabaseManageServiceImpl extends BaseService implements DatabaseMa
      * @see DatabaseManageService#saveDatabaseConfig(DataSourceConfig)
      */
     @Override
-    public GeneralResponse saveDatabaseConfig(DataSourceConfig databaseConfig) {
-        int insert = databaseConfigMapper.insert(databaseConfig.toPersistent());
-        return generateResponseObject(insert > 0, "datasource insert success", "datasource insert failure");
+    public GeneralResponse saveDatabaseConfig(DataSourceConfig dataSourceConfig) {
+        dataSourceConfig.setDatabaseUniqueId(generateUuid());
+        int insert = databaseConfigMapper.insert(dataSourceConfig.toPersistent());
+        return generateResponseObject(insert > 0, dataSourceConfig, "datasource insert failure");
     }
 
     /**
@@ -72,7 +73,7 @@ public class DatabaseManageServiceImpl extends BaseService implements DatabaseMa
     public GeneralResponse updateDatabaseConfig(DataSourceConfig databaseConfig) throws CustomException {
         checkDatasourceIsInUse(databaseConfig.getDatabaseUniqueId());
         int update = databaseConfigMapper.update(databaseConfig.toPersistent(), new LambdaQueryWrapper<DatabaseConfig>().eq(DatabaseConfig::getDatabaseUniqueId, databaseConfig.getDatabaseUniqueId()));
-        return generateResponseObject(update > 0, "datasource update success", "datasource update failure");
+        return generateResponseObject(update > 0, databaseConfig, "datasource update failure");
     }
 
     /**
@@ -80,12 +81,12 @@ public class DatabaseManageServiceImpl extends BaseService implements DatabaseMa
      */
     @Override
     public GeneralResponse queryDatabaseConfigPage(DatabaseConfigPageQueryParam queryParam) {
-        DatabaseConfig param = queryParam.getQueryParam().toPersistent();
+        DatabaseConfig param = queryParam.getQueryParam().toQuery();
         Page<DatabaseConfig> databaseConfigPage = databaseConfigMapper.selectPage(
                 new Page<>(queryParam.getPageNum(), queryParam.getPageSize()),
                 new LambdaQueryWrapper<DatabaseConfig>()
-                        .eq(!param.getDatabaseUniqueId().isEmpty(), DatabaseConfig::getDatabaseUniqueId, param.getDatabaseUniqueId())
-                        .like(!param.getName().isEmpty(), DatabaseConfig::getName, param.getName())
+                        .like(param.getAddress() != null && !param.getAddress().isEmpty(), DatabaseConfig::getDatabaseUniqueId, param.getDatabaseUniqueId())
+                        .like(param.getName() != null && param.getName().isEmpty(), DatabaseConfig::getName, param.getName())
         );
         return generateSuccessfulResponseObject(databaseConfigPage);
     }
@@ -108,5 +109,18 @@ public class DatabaseManageServiceImpl extends BaseService implements DatabaseMa
         if (!CollectionUtils.isEmpty(dataObjects)) {
             throw new CustomException(ErrorCode.INVALID_OPERATION, "current datasource is in use, can not be modified");
         }
+    }
+
+    /**
+     * @see DatabaseManageService#queryOne(String)
+     */
+    @Override
+    public DataSourceConfig queryOne(String uniqueId) {
+        return DataSourceConfig.readFromPersistent(
+                databaseConfigMapper.selectOne(
+                        new LambdaQueryWrapper<DatabaseConfig>()
+                                .eq(DatabaseConfig::getDatabaseUniqueId, uniqueId)
+                )
+        );
     }
 }

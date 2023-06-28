@@ -75,15 +75,15 @@ public class DataSourceConfig {
 
     public DatabaseConfig toPersistent() {
         return DatabaseConfig.builder()
-                .databaseUniqueId(databaseUniqueId)
-                .databaseType(databaseType.getName())
-                .instance(instance)
-                .databaseName(databaseName)
-                .name(name)
-                .username(username)
-                .password(password)
-                .address(address)
-                .port(port)
+                .databaseUniqueId(this.databaseUniqueId)
+                .databaseType(this.databaseType == null ? null : this.databaseType.getName())
+                .instance(this.instance)
+                .databaseName(this.databaseName)
+                .name(this.name)
+                .username(this.username)
+                .password(this.password)
+                .address(this.address)
+                .port(this.port)
                 .build();
     }
 

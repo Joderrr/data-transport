@@ -6,7 +6,9 @@ import com.stewart.datatransport.pojo.vo.object.DataObjectConfig;
 import com.stewart.datatransport.pojo.vo.object.DataObjectConfigPageQueryParam;
 import com.stewart.datatransport.service.DataObjectManageService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -33,8 +35,8 @@ public class DataObjectManageController extends BaseController {
      * @param config    dataObject's configuration
      * @return          execute result
      */
-    @RequestMapping("/execute")
-    public GeneralResponse executeQueryScript(DataObjectConfig config){
+    @RequestMapping(method = RequestMethod.POST, value = "/executeQueryScript")
+    public GeneralResponse executeQueryScript(@RequestBody DataObjectConfig config){
         return execute(() -> dataObjectManageService.executeQueryScript(config));
     }
 
@@ -44,8 +46,8 @@ public class DataObjectManageController extends BaseController {
      * @param config    dataObject's configuration
      * @return          save result
      */
-    @RequestMapping("/save")
-    public GeneralResponse saveConfiguration(DataObjectConfig config){
+    @RequestMapping(method = RequestMethod.POST, value = "/saveDataObject")
+    public GeneralResponse saveConfiguration(@RequestBody DataObjectConfig config){
         return execute(() -> dataObjectManageService.saveDataObject(config));
     }
 
@@ -56,8 +58,8 @@ public class DataObjectManageController extends BaseController {
      * @return          update result
      * @throws CustomException  data is in use, can not be modified
      */
-    @RequestMapping("/update")
-    public GeneralResponse updateConfiguration(DataObjectConfig config) {
+    @RequestMapping(method = RequestMethod.PUT, value = "/updateDataObject")
+    public GeneralResponse updateConfiguration(@RequestBody DataObjectConfig config) {
         return execute(() -> {
             try {
                 return dataObjectManageService.updateDataObject(config);
@@ -74,8 +76,8 @@ public class DataObjectManageController extends BaseController {
      * @param config    data object's configuration, id is most important
      * @return          delete result
      */
-    @RequestMapping("/delete")
-    public GeneralResponse deleteConfiguration(DataObjectConfig config){
+    @RequestMapping(method = RequestMethod.DELETE, value = "/deleteDataObject")
+    public GeneralResponse deleteConfiguration(@RequestBody DataObjectConfig config){
         return execute(() -> dataObjectManageService.deleteDataObject(config));
     }
 
@@ -85,8 +87,8 @@ public class DataObjectManageController extends BaseController {
      * @param param     query params
      * @return          query result
      */
-    @RequestMapping("/query")
-    public GeneralResponse queryConfiguration(DataObjectConfigPageQueryParam param){
+    @RequestMapping(method = RequestMethod.POST, value = "/queryDataObjects")
+    public GeneralResponse queryConfiguration(@RequestBody DataObjectConfigPageQueryParam param){
         return execute(() -> dataObjectManageService.queryDataObject(param));
     }
 

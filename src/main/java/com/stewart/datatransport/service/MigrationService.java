@@ -1,5 +1,6 @@
 package com.stewart.datatransport.service;
 
+import com.stewart.datatransport.pojo.vo.base.GeneralResponse;
 import com.stewart.datatransport.pojo.vo.database.DataSourceConfig;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,5 +34,5 @@ public interface MigrationService {
      * @param file              import data file
      * @return                  import status
      */
-    boolean importMigrationPackage(DataSourceConfig dataSourceConfig, MultipartFile file);
+    GeneralResponse importMigrationPackage(DataSourceConfig dataSourceConfig, MultipartFile file);
 }

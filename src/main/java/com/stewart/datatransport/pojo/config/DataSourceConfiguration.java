@@ -5,7 +5,6 @@ import com.stewart.datatransport.util.DatabaseConfigUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
 import static com.stewart.datatransport.constant.DatabaseConstants.EMPTY_STR;
 
@@ -17,7 +16,7 @@ import static com.stewart.datatransport.constant.DatabaseConstants.EMPTY_STR;
  */
 @Getter
 @Setter
-@Component
+//@Component
 @ConfigurationProperties(prefix = "dataSource")
 public class DataSourceConfiguration {
 

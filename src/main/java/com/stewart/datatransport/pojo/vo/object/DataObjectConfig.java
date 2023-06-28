@@ -37,6 +37,8 @@ public class DataObjectConfig {
      */
     Long databaseId;
 
+    String tableName;
+
     /**
      * database's query sql script
      */
@@ -52,6 +54,7 @@ public class DataObjectConfig {
                 .name(objectName)
                 .dataObjectUniqueId(objectUniqueId)
                 .datasourceId(databaseId)
+                .tableName(tableName)
                 .queryScript(queryScript)
                 .dataStructure(JacksonUtil.toJsonString(fieldMap))
                 .build();
@@ -64,6 +67,7 @@ public class DataObjectConfig {
                 .fieldMap(JacksonUtil.fromJsonToObject(dataObject.getDataStructure(), Map.class))
                 .queryScript(dataObject.getQueryScript())
                 .objectName(dataObject.getName())
+                .tableName(dataObject.getTableName())
                 .build();
     }
 

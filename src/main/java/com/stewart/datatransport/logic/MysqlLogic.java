@@ -97,9 +97,7 @@ public class MysqlLogic implements DatabaseLogic {
 
     @Override
     public boolean executeInsertScript(DataSourceConfig dataSourceConfig, String script) {
-        List<Map<String,String>> results = new ArrayList<>();
         try{
-            List<String> queryColumn = resolveQueryColumn(script);
             String configurationUrl = getConfigurationUrls(dataSourceConfig);
             Connection connection = getConnection(configurationUrl, dataSourceConfig.getUsername(), dataSourceConfig.getPassword());
             PreparedStatement preparedStatement = connection.prepareStatement(script);
@@ -174,8 +172,9 @@ public class MysqlLogic implements DatabaseLogic {
     private String resolveCondition(String queryScript, Map<String, String> condition){
         String tempSql = queryScript;
         for (Map.Entry<String, String> entry : condition.entrySet()) {
-            String replaceKey = "{" + entry.getKey() + "}";
-            tempSql = queryScript.replace(replaceKey, entry.getValue());
+            String replaceKey = "#{" + entry.getKey() + "}";
+            String replaceValue = "'" + entry.getValue() + "'";
+            tempSql = queryScript.replace(replaceKey, replaceValue);
         }
         return tempSql;
     }

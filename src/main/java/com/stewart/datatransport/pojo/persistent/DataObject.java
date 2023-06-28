@@ -3,7 +3,10 @@ package com.stewart.datatransport.pojo.persistent;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -18,6 +21,9 @@ import java.time.LocalDateTime;
  */
 @TableName("data_object")
 @Builder
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class DataObject implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -39,6 +45,11 @@ public class DataObject implements Serializable {
      * data object uuid
      */
     private String dataObjectUniqueId;
+
+    /**
+     * data object table name
+     */
+    private String tableName;
 
     /**
      * data object query script
@@ -91,6 +102,14 @@ public class DataObject implements Serializable {
 
     public void setDataObjectUniqueId(String dataObjectUniqueId) {
         this.dataObjectUniqueId = dataObjectUniqueId;
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
     }
 
     public String getQueryScript() {

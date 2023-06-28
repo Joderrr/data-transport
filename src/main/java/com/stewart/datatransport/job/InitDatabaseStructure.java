@@ -3,9 +3,7 @@ package com.stewart.datatransport.job;
 import com.stewart.datatransport.constant.DatabaseConstants;
 import com.stewart.datatransport.pojo.config.DataSourceConfiguration;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.sql.Connection;
 import java.sql.Driver;
@@ -26,13 +24,13 @@ import java.sql.SQLException;
  * @date 2023/1/21
  */
 @Slf4j
-@Component
+//@Component
 public class InitDatabaseStructure {
 
     @Resource
     DataSourceConfiguration dataSourceConfiguration;
 
-    @PostConstruct
+    //@PostConstruct
     public void initDatabaseStructure() throws SQLException {
         if(dataSourceConfiguration.isInitDatabaseIfNotExist()){
             Connection connection = null;
