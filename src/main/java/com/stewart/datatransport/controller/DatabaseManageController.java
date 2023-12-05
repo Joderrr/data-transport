@@ -73,4 +73,14 @@ public class DatabaseManageController extends BaseController {
     public GeneralResponse searchDatabaseConfig(@RequestBody DatabaseConfigPageQueryParam queryParam) {
         return execute(() -> databaseManageService.queryDatabaseConfigPage(queryParam));
     }
+
+    /**
+     * search database configuration page
+     *
+     * @return query result
+     */
+    @RequestMapping(method = RequestMethod.POST, value = "/queryAll")
+    public GeneralResponse searchAllDatabases() {
+        return execute(() -> databaseManageService.queryAll());
+    }
 }

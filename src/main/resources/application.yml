@@ -7,6 +7,12 @@ spring:
     url: jdbc:mysql://127.0.0.1:3306/data-transport?useSSL=false&serverTimezone=GMT
     username: data_transport
     password: data_transport_password
+  thymeleaf:
+    cache: false
+    encoding: UTF-8
+    mode: HTML
+    suffix: .html
+    prefix: classpath:/templates/
 
 dataSource:
   databaseType: MySQL

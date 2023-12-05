@@ -92,5 +92,15 @@ public class DataObjectManageController extends BaseController {
         return execute(() -> dataObjectManageService.queryDataObject(param));
     }
 
+    /**
+     * query data object configurations
+     *
+     * @return          query result
+     */
+    @RequestMapping(method = RequestMethod.GET, value = "/queryAll")
+    public GeneralResponse queryAll(){
+        return execute(() -> dataObjectManageService.queryAll());
+    }
+
 
 }

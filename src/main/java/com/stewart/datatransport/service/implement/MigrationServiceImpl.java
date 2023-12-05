@@ -61,7 +61,7 @@ public class MigrationServiceImpl extends BaseService implements MigrationServic
         DataRelations dataRelations = dataSetConfig.getDataRelations();
         DatabaseConfig databaseConfig = databaseConfigMapper.selectOne(
                 new LambdaQueryWrapper<DatabaseConfig>()
-                        .eq(DatabaseConfig::getId, dataRelations.getRoot().getDatasourceId()));
+                        .eq(DatabaseConfig::getDatabaseUniqueId, dataRelations.getRoot().getDatasourceId()));
         List<Map<String, String>> rootQuery = databaseOperation.executeQueryScript(
                 DataSourceConfig.readFromPersistent(databaseConfig), dataRelations.getRoot().getQueryScript(), condition);
         if(rootQuery.size() != 1){
@@ -79,6 +79,10 @@ public class MigrationServiceImpl extends BaseService implements MigrationServic
         getDatas(children, root, allData);
 
         //prepare the migration object, then write back
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json;charset=UTF-8");
+        String fileName = "migration_data.json";
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
         MigrationData migrationData = new MigrationData(dataSetConfig, allData);
         ServletOutputStream outputStream = null;
         try {
@@ -114,7 +118,7 @@ public class MigrationServiceImpl extends BaseService implements MigrationServic
             String script = target.getSelf().getQueryScript();
             DatabaseConfig targetDbConfig = databaseConfigMapper.selectOne(
                     new LambdaQueryWrapper<DatabaseConfig>()
-                            .eq(DatabaseConfig::getId, target.getSelf().getDatasourceId()));
+                            .eq(DatabaseConfig::getDatabaseUniqueId, target.getSelf().getDatasourceId()));
             Map<String, List<String>> relations= target.getRelationShip();
             for (Map.Entry<String, List<String>> conditions : relations.entrySet()) {
                 String value = current.get(conditions.getKey());

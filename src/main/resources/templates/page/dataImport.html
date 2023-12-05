@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>数据迁移工具 - 数据导入</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../lib/layui-v2.6.3/css/layui.css" media="all">
+</head>
+<body>
+<div class="layuimini-main" id="addpage">
+    <div style="margin: 10px 10px 10px 10px">
+        <div class="layui-form layui-form-pane"  action="">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">选择数据源</label>
+                    <div class="layui-input-inline">
+                        <select name="datasource" id="datasource">
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <div class="layui-input-block">
+                    <input type="file" id="uploadFile" >
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" onclick="doSubmit()">开始导入</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script src="../lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
+<script type="text/javascript" th:inline="none">
+    var list = [];
+    window.onload = function(){
+        initDatasources();
+    }
+
+    function initDatasources(){
+        $.ajax({
+            type: 'post',
+            url: '../database/manage/queryAll',
+            processData: false,
+            contentType:'application/json',
+            dataType:"json",
+            data: "",
+            success: function(res){
+                var content = res.content;
+                console.log(content);
+
+                for(var i = 0; i < content.length; i++){
+                    var element = content[i];
+                    var item = {
+                        text: element.name
+                        ,id: element.databaseUniqueId
+                    }
+                    list[i] = item;
+                }
+                console.log(list)
+                loadDatabases();
+            },
+            error: function(){
+                alert("没查到数据");
+            }
+        });
+    }
+
+    function loadDatabases(){
+        var form = layui.form;
+        list.forEach((data) => {
+            $("#datasource").append("<option value=\""+ data.id +"\">"+ data.text +"</option>");
+        });
+        form.render();
+    }
+
+    function doSubmit(){
+        uploadFile();
+    }
+
+    function uploadFile() {
+        const fileInput = document.getElementById('uploadFile');
+        const file = fileInput.files[0];
+
+        if (file) {
+            const formData = new FormData();
+            formData.append('multipartFile', file);
+
+            const dataSourceId = $("#datasource").val(); // Replace with the actual data source ID
+            const apiUrl = "/data/migration/import/"+dataSourceId;
+
+            $.ajax({
+                url: apiUrl,
+                type: 'POST',
+                data: formData,
+                processData: false,  // Important: Don't process the data
+                contentType: false,  // Important: Don't set contentType
+                success: function(response) {
+                    console.log('File uploaded successfully:', response);
+                    // Handle the response as needed
+                },
+                error: function(error) {
+                    console.error('Error uploading file:', error);
+                    // Handle the error as needed
+                }
+            });
+        } else {
+            console.error('No file selected.');
+        }
+    }
+</script>
+</body>
+</html>

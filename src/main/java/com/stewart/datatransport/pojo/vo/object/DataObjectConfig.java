@@ -1,5 +1,8 @@
 package com.stewart.datatransport.pojo.vo.object;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stewart.datatransport.enums.object.DataType;
 import com.stewart.datatransport.pojo.persistent.DataObject;
 import com.stewart.datatransport.util.JacksonUtil;
@@ -8,6 +11,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,9 +39,14 @@ public class DataObjectConfig {
     /**
      * related database's id
      */
-    Long databaseId;
+    String databaseId;
 
     String tableName;
+
+    /**
+     * data object query condition
+     */
+    List<String> queryCondition;
 
     /**
      * database's query sql script
@@ -49,22 +58,31 @@ public class DataObjectConfig {
      */
     Map<String, DataType> fieldMap;
 
+    /**
+     * datasourceName
+     */
+    String datasourceName;
+
     public DataObject toPersistent() {
         return DataObject.builder()
                 .name(objectName)
                 .dataObjectUniqueId(objectUniqueId)
                 .datasourceId(databaseId)
                 .tableName(tableName)
+                .queryCondition(JacksonUtil.toJsonString(queryCondition))
                 .queryScript(queryScript)
                 .dataStructure(JacksonUtil.toJsonString(fieldMap))
                 .build();
     }
 
-    public static DataObjectConfig readFromPersistent(DataObject dataObject){
+    public static DataObjectConfig readFromPersistent(DataObject dataObject) throws JsonProcessingException {
         return DataObjectConfig.builder()
                 .databaseId(dataObject.getDatasourceId())
                 .objectUniqueId(dataObject.getDataObjectUniqueId())
-                .fieldMap(JacksonUtil.fromJsonToObject(dataObject.getDataStructure(), Map.class))
+                .fieldMap(new ObjectMapper().readValue(dataObject.getDataStructure(), new TypeReference<Map<String, DataType>>() {
+                }))
+                .queryCondition(new ObjectMapper().readValue(dataObject.getQueryCondition(), new TypeReference<List<String>>() {
+                }))
                 .queryScript(dataObject.getQueryScript())
                 .objectName(dataObject.getName())
                 .tableName(dataObject.getTableName())

@@ -42,7 +42,7 @@ public class DataMigrationController extends BaseController {
     }
 
     /**
-     * export json file
+     * import json file
      *
      * @param multipartFile     import file
      * @param dataSourceId      datasource unique id

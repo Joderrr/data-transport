@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>数据迁移工具 - 数据导出</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../lib/layui-v2.6.3/css/layui.css" media="all">
+</head>
+<body>
+<div class="layuimini-main" id="addpage">
+    <div style="margin: 10px 10px 10px 10px">
+        <div class="layui-form layui-form-pane"  action="">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">选择数据集</label>
+                    <div class="layui-input-inline">
+                        <select name="dataset" id="dataset" >
+                        </select>
+                    </div>
+                    <div class="layui-input-inline">
+                        <button onclick="loadCondition()">加载条件</button>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">查询条件</label>
+                <div class="layui-input-block" id="condition">
+                    <input id="conditionName" />
+                    :
+                    <input id="conditionValue"/>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" onclick="doSubmit()">开始导出</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script src="../lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
+<script type="text/javascript" th:inline="none">
+
+    var list = [];
+    window.onload = function(){
+        initDataSets();
+    }
+
+    function initDataSets(){
+        $.ajax({
+            type: 'post',
+            url: '../dataset/manage/queryAll',
+            processData: false,
+            contentType:'application/json',
+            dataType:"json",
+            data: "",
+            success: function(res){
+                var content = res.content;
+                console.log(content);
+
+                for(var i = 0; i < content.length; i++){
+                    var element = content[i];
+                    var item = {
+                        text: element.name
+                        ,id: element.dataSetUniqueId
+                    }
+                    list[i] = item;
+                }
+                console.log(list)
+                loadDatasets();
+            },
+            error: function(){
+                alert("没查到数据");
+            }
+        });
+    }
+
+    function loadDatasets(){
+        var form = layui.form;
+        list.forEach((data) => {
+            $("#dataset").append("<option value=\""+ data.id +"\">"+ data.text +"</option>");
+        });
+        form.render();
+    }
+
+    function loadCondition(){
+        var datasetId = $("#dataset").val();
+        $.ajax({
+            type: 'get',
+            url: '../dataset/manage/condition/' + datasetId,
+            processData: false,
+            contentType:'application/json',
+            dataType:"json",
+            data: "",
+            success: function(res){
+                var content = res.content;
+                console.log(content);
+                $("#conditionName").val(content[0]);
+            },
+            error: function(){
+                console.log("没查到条件");
+            }
+        });
+    }
+
+
+    function doSubmit(){
+        var datasetId = $("#dataset").val();
+        var url = "/data/migration/export";
+        var condition = new Map;
+        condition.set($("#conditionName").val() , $("#conditionValue").val());
+        let obj = {};
+        condition.forEach((value, key) => {
+            obj[key] = value;
+        });
+        $.ajax({
+            type: 'post',
+            url: url,
+            processData: false,
+            contentType:'application/json',
+            dataType:"json",
+            data: JSON.stringify({
+                "dataSetUniqueId":datasetId,
+                "condition":obj
+            }),
+            success: function(res){
+                console.log("成了")
+            },
+            error: function(){
+                console.log("败了");
+            }
+        });
+
+    }
+</script>
+</body>
+</html>

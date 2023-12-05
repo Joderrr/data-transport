@@ -54,4 +54,11 @@ public interface DataObjectManageService {
      */
     GeneralResponse queryDataObject(DataObjectConfigPageQueryParam queryParam);
 
+    /**
+     * data object page query method
+     *
+     * @return query result
+     */
+    GeneralResponse queryAll();
+
 }

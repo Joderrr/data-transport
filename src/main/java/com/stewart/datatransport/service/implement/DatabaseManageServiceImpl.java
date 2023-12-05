@@ -20,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * database manage service implementation
@@ -115,12 +116,34 @@ public class DatabaseManageServiceImpl extends BaseService implements DatabaseMa
      * @see DatabaseManageService#queryOne(String)
      */
     @Override
-    public DataSourceConfig queryOne(String uniqueId) {
+    public DataSourceConfig queryOne(String id) {
+        return DataSourceConfig.readFromPersistent(
+                databaseConfigMapper.selectOne(
+                        new LambdaQueryWrapper<DatabaseConfig>()
+                                .eq(DatabaseConfig::getDatabaseUniqueId, id)
+                )
+        );
+    }
+
+    @Override
+    public DataSourceConfig queryOneByUniqueId(String uniqueId) {
         return DataSourceConfig.readFromPersistent(
                 databaseConfigMapper.selectOne(
                         new LambdaQueryWrapper<DatabaseConfig>()
                                 .eq(DatabaseConfig::getDatabaseUniqueId, uniqueId)
                 )
         );
+    }
+
+    /**
+     * @see DatabaseManageService#queryAll()
+     */
+    @Override
+    public GeneralResponse queryAll() {
+        List<DatabaseConfig> databaseConfigs = databaseConfigMapper.selectList(
+                new LambdaQueryWrapper<>(DatabaseConfig.class)
+                        .isNotNull(DatabaseConfig::getDatabaseUniqueId)
+        );
+        return generateSuccessfulResponseObject(databaseConfigs.stream().map(DataSourceConfig::readFromPersistent).collect(Collectors.toList()));
     }
 }

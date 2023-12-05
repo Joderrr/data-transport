@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>数据迁移工具 - 添加数据源</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../lib/layui-v2.6.3/css/layui.css" media="all">
+</head>
+<body>
+<div class="layuimini-main" id="addpage">
+    <div style="margin: 10px 10px 10px 10px">
+        <div class="layui-form layui-form-pane"  action="">
+            <div class="layui-form-item">
+                <label class="layui-form-label">数据对象名称</label>
+                <div class="layui-input-block">
+                    <input type="text" id="dataObjectName" name="dataObjectName" autocomplete="off"
+                           placeholder="请输入数据对象名称"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">关联数据源</label>
+                    <div class="layui-input-inline">
+                        <select name="quiz" id="quiz">
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">数据对象查询脚本</label>
+                <div class="layui-input-block">
+                    <textarea id="sql" placeholder="请输入sql脚本" class="layui-textarea"></textarea>
+                </div>
+                <button class="layui-btn" onclick="executeScript()">执行脚本</button>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">SQL执行结果</label>
+                <table class="layui-hide" id="dataTable" lay-filter="currentTableFilter"></table>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" onclick="checkAndSubmit()">检查并提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script src="../lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
+<script type="text/javascript" th:inline="none">
+    var fieldMap = new Map();
+    var list = [];
+    var sqlCheckResult;
+    window.onload = function(){
+        initDatasources();
+    }
+
+    function initDatasources(){
+        $.ajax({
+            type: 'post',
+            url: '../database/manage/queryAll',
+            processData: false,
+            contentType:'application/json',
+            dataType:"json",
+            data: "",
+            success: function(res){
+                var content = res.content;
+                console.log(content);
+
+                for(var i = 0; i < content.length; i++){
+                    var element = content[i];
+                    var item = {
+                        text: element.name
+                        ,id: element.databaseUniqueId
+                    }
+                    list[i] = item;
+                }
+                console.log(list)
+                loadDatabases();
+            },
+            error: function(){
+                alert("没查到数据");
+            }
+        });
+    }
+
+    function loadDatabases(){
+        var form = layui.form;
+        list.forEach((data) => {
+            $("#quiz").append("<option value=\""+ data.id +"\">"+ data.text +"</option>");
+        });
+        form.render();
+    }
+
+    function executeScript(){
+        var sql = $("#sql").val();
+        var databaseId = $("#quiz").val();
+        console.log("sql -> " + sql);
+        console.log("database -> " + databaseId);
+        $.ajax({
+            type: 'post',
+            url: '../data/manage/executeQueryScript',
+            processData: false,
+            contentType:'application/json',
+            dataType:"json",
+            data: JSON.stringify({
+                "queryScript": sql,
+                "databaseId": databaseId
+            }),
+            success: function(res){
+                sqlCheckResult = true;
+                var content = res.content;
+                fillTable(content);
+            },
+            error: function(){
+                alert("没查到数据");
+            }
+        })
+    }
+
+    function fillTable(records){
+        if(records.length > 0){
+            var keys = Object.keys(records[0])
+            var tableHead = [[]];
+            var headContent = [];
+            for(var i = 0; i < keys.length; i ++){
+                var key = keys[i];
+                var col = {
+                    field: key, title: key, minWidth: 80
+                };
+                headContent[i] = col;
+                fieldMap.set(key, "String");
+            }
+            tableHead[0] = headContent;
+            layui.use('table', function(){
+                var table = layui.table;
+                //展示已知数据
+                table.render({
+                    elem: '#dataTable'
+                    ,cols: tableHead
+                    ,data: records
+                    ,even: true
+                });
+            });
+        } else {
+            alert("没有查询到数据");
+        }
+
+    }
+
+
+    function doSubmit(){
+        var dataObjectName = $("#dataObjectName").val();
+        var sql = $("#sql").val();
+        var databaseId = $("#quiz").val();
+        $.ajax({
+            type: 'post',
+            url: '../data/manage/saveDataObject',
+            processData: false,
+            contentType:'application/json',
+            dataType:"json",
+            data: JSON.stringify({
+                "objectName": dataObjectName,
+                "databaseId": databaseId,
+                "queryScript": sql,
+                "fieldMap": fieldMap
+            }),
+            success:function(res){
+                console.log(res);
+                alert("数据保存成功");
+                $("#dataObjectName").val("");
+                $("#sql").val("");
+                fieldMap = new Map();
+            },
+            error:function(){
+                alert("校验成功，但数据提交失败");
+            }
+        });
+
+    }
+
+    function checkAndSubmit(){
+        var dataObjectName = $("#dataObjectName").val();
+        var sql = $("#sql").val();
+        var databaseId = $("#quiz").val();
+        if(sqlCheckResult){
+            if(dataObjectName == null){
+                alert("数据对象名称不能为空");
+            }
+            if(databaseId == null){
+                alert("数据库必选");
+            }
+            if(sql == null){
+                alert("sql脚本不能为空");
+            }
+        } else {
+            alert("请先执行脚本验证sql有效性")
+        }
+        doSubmit();
+    }
+</script>
+</body>
+</html>

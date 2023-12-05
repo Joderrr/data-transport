@@ -3,6 +3,7 @@ package com.stewart.datatransport.controller;
 import com.stewart.datatransport.pojo.vo.base.GeneralResponse;
 import com.stewart.datatransport.pojo.vo.dataset.DataSetConfig;
 import com.stewart.datatransport.service.DataSetManageService;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -65,5 +66,37 @@ public class DataSetManageController extends BaseController {
     @RequestMapping(method = RequestMethod.POST, value = "/queryDataSets")
     public GeneralResponse queryDataSet(@RequestBody DataSetConfig dataSetConfig){
         return execute(() -> dataSetManageService.queryDataSet(dataSetConfig));
+    }
+
+    /**
+     * query dataset by dataset configuration
+     *
+     * @return  query result
+     */
+    @RequestMapping(method = RequestMethod.POST, value = "/queryAll")
+    public GeneralResponse queryDataSet(){
+        return execute(() -> dataSetManageService.queryAll());
+    }
+
+    /**
+     * query dataset by dataset configuration
+     *
+     * @param dataSetUniqueId   dataSet query param
+     * @return  query result
+     */
+    @RequestMapping(method = RequestMethod.GET, value = "/dataSetDetail/{dataSetUniqueId}")
+    public GeneralResponse dataSetDetail(@PathVariable String dataSetUniqueId){
+        return execute(() -> dataSetManageService.queryDataSetDetail(dataSetUniqueId));
+    }
+
+    /**
+     * query dataset by dataset configuration
+     *
+     * @param dataSetUniqueId   dataSet query param
+     * @return  query result
+     */
+    @RequestMapping(method = RequestMethod.GET, value = "/condition/{dataSetUniqueId}")
+    public GeneralResponse queryCondition(@PathVariable String dataSetUniqueId){
+        return execute(() -> dataSetManageService.queryCondition(dataSetUniqueId));
     }
 }

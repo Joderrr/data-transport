@@ -58,9 +58,24 @@ public interface DatabaseManageService {
     /**
      * query one datasource configuration by unique id
      *
-     * @param uniqueId  unique id
+     * @param id        id
      * @return          datasource configuration
      */
-    DataSourceConfig queryOne(String uniqueId);
+    DataSourceConfig queryOne(String id);
+
+    /**
+     * query one datasource configuration by unique id
+     *
+     * @param uniqueId  id
+     * @return          datasource configuration
+     */
+    DataSourceConfig queryOneByUniqueId(String uniqueId);
+
+    /**
+     * query one datasource configuration by unique id
+     *
+     * @return          datasource configuration
+     */
+    GeneralResponse queryAll();
 
 }

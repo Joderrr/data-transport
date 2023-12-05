@@ -2,8 +2,10 @@ package com.stewart.datatransport.service.implement;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.stewart.datatransport.component.DatabaseOperation;
 import com.stewart.datatransport.enums.ErrorCode;
+import com.stewart.datatransport.enums.object.DataType;
 import com.stewart.datatransport.exception.CustomException;
 import com.stewart.datatransport.mapper.DataObjectMapper;
 import com.stewart.datatransport.mapper.DataSetMapper;
@@ -17,12 +19,19 @@ import com.stewart.datatransport.pojo.vo.object.DataObjectConfig;
 import com.stewart.datatransport.pojo.vo.object.DataObjectConfigPageQueryParam;
 import com.stewart.datatransport.service.BaseService;
 import com.stewart.datatransport.service.DataObjectManageService;
+import com.stewart.datatransport.service.DatabaseManageService;
+import com.stewart.datatransport.util.JacksonUtil;
+import com.stewart.datatransport.util.SqlAnalyzer;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * data object management service's implementation
@@ -31,6 +40,7 @@ import java.util.Map;
  * @date 2023/2/17
  */
 @Service
+@Slf4j
 public class DataObjectManageServiceImpl extends BaseService implements DataObjectManageService {
 
     @Resource
@@ -38,6 +48,9 @@ public class DataObjectManageServiceImpl extends BaseService implements DataObje
 
     @Resource
     DatabaseConfigMapper databaseConfigMapper;
+
+    @Resource
+    DatabaseManageService databaseManageService;
 
     @Resource
     DataObjectMapper dataObjectMapper;
@@ -52,7 +65,7 @@ public class DataObjectManageServiceImpl extends BaseService implements DataObje
     public GeneralResponse executeQueryScript(DataObjectConfig configuration) {
         DataSourceConfig dataSourceConfig = DataSourceConfig.readFromPersistent(databaseConfigMapper.selectOne(
                 new LambdaQueryWrapper<DatabaseConfig>()
-                        .eq(DatabaseConfig::getId, configuration.getDatabaseId())
+                        .eq(DatabaseConfig::getDatabaseUniqueId, configuration.getDatabaseId())
         ));
         List<Map<String, String>> result =  databaseOperation.executeQueryScript(dataSourceConfig, configuration.getQueryScript());
         return generateSuccessfulResponseObject(result);
@@ -64,6 +77,8 @@ public class DataObjectManageServiceImpl extends BaseService implements DataObje
     @Override
     public GeneralResponse saveDataObject(DataObjectConfig configuration) {
         configuration.setObjectUniqueId(generateUuid());
+        configuration.setTableName(SqlAnalyzer.extractSingleTableName(configuration.getQueryScript()));
+        configuration.setQueryCondition(SqlAnalyzer.extractFieldsFromWhereClause(configuration.getQueryScript()));
         int insert = dataObjectMapper.insert(configuration.toPersistent());
         return generateResponseObject(insert > 0, configuration, "data object insert failure");
     }
@@ -104,12 +119,54 @@ public class DataObjectManageServiceImpl extends BaseService implements DataObje
         if(doc.getDatabaseId() != null) {
             wrapper.eq(DataObject::getDatasourceId, doc.getDatabaseId());
         }
-        return generateSuccessfulResponseObject(
-                dataObjectMapper.selectPage(
-                        new Page<>(queryParam.getPageNum(), queryParam.getPageSize()),
-                        wrapper
-                )
+        //get origin page object
+        Page<DataObject> dataObjectPage = dataObjectMapper.selectPage(
+                new Page<>(queryParam.getPageNum(), queryParam.getPageSize()),
+                wrapper
         );
+        //get records from page object
+        List<DataObject> records = dataObjectPage.getRecords();
+        //transfer its datasourceId to datasource object
+        List<DataObjectConfig> collect = records.stream().map(dataObject -> {
+            DataObjectConfig config = null;
+            try {
+                config = DataObjectConfig.readFromPersistent(dataObject);
+            } catch (JsonProcessingException e) {
+                log.error("转型异常");
+                config.setObjectName(dataObject.getName());
+                config.setObjectUniqueId(dataObject.getDataObjectUniqueId());
+                config.setQueryScript(dataObject.getQueryScript());
+                config.setTableName(dataObject.getTableName());
+                config.setDatabaseId(dataObject.getDatasourceId());
+                Map<String, DataType> fieldMap = new HashMap<>();
+                Map<String, String> dataStructure = JacksonUtil.fromJsonToObject(dataObject.getDataStructure(), Map.class);
+                dataStructure.entrySet()
+                        .forEach(entity -> {
+                            fieldMap.put(entity.getKey(), DataType.valueOf(entity.getValue()));
+                        });
+                config.setFieldMap(fieldMap);
+            }
+            DataSourceConfig dataSourceConfig = databaseManageService.queryOneByUniqueId(dataObject.getDatasourceId());
+            if (dataSourceConfig != null){
+                config.setDatasourceName(dataSourceConfig.getName());
+            }
+            return config;
+        }).collect(Collectors.toList());
+        //re-package the page object
+        Page<DataObjectConfig> page = new Page<>();
+        BeanUtils.copyProperties(dataObjectPage, page);
+        page.setRecords(collect);
+        //and return the re-packaged page object
+        return generateSuccessfulResponseObject(page);
+    }
+
+    /**
+     * @see DataObjectManageService#queryAll()
+     */
+    @Override
+    public GeneralResponse queryAll() {
+        List<DataObject> dataObjects = dataObjectMapper.selectList(new LambdaQueryWrapper<DataObject>().isNotNull(DataObject::getDataObjectUniqueId));
+        return generateSuccessfulResponseObject(dataObjects);
     }
 
     private void checkDataObjectIsInUse(String uniqueId) throws CustomException {

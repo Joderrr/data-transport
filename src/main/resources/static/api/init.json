@@ -1,0 +1,109 @@
+{
+  "homeInfo": {
+    "title": "首页",
+    "href": "page/welcome-1.html?t=1"
+  },
+  "logoInfo": {
+    "title": "Data Trans",
+    "image": "images/logo.png",
+    "href": ""
+  },
+  "menuInfo": [
+    {
+      "title": "基础数据管理",
+      "icon": "fa fa-address-book",
+      "href": "",
+      "target": "_self",
+      "child": [
+        {
+          "title": "数据源管理",
+          "href": "",
+          "icon": "fa fa-home",
+          "target": "_self",
+          "child": [
+            {
+              "title": "数据源列表",
+              "href": "page/datasource.html",
+              "icon": "fa fa-home",
+              "target": "_self"
+            },
+            {
+              "title": "添加数据源",
+              "href": "page/addDatasource.html",
+              "icon": "fa fa-home",
+              "target": "_self"
+            }
+          ]
+        },
+        {
+          "title": "表关系配置",
+          "href": "",
+          "icon": "fa fa-window-maximize",
+          "target": "_self",
+          "child": [
+            {
+              "title": "数据对象列表",
+              "href": "page/dataObject.html",
+              "icon": "fa fa-home",
+              "target": "_self"
+            },
+            {
+              "title": "创建数据对象",
+              "href": "page/addDataObject.html",
+              "icon": "fa fa-home",
+              "target": "_self"
+            }
+          ]
+        },
+        {
+          "title": "查询条件配置",
+          "href": "",
+          "icon": "fa fa-gears",
+          "target": "_self",
+          "child": [
+            {
+              "title": "数据集列表",
+              "href": "page/dataset.html",
+              "icon": "fa fa-home",
+              "target": "_self"
+            },
+            {
+              "title": "创建数据集",
+              "href": "page/addDataset.html",
+              "icon": "fa fa-home",
+              "target": "_self"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "迁移管理",
+      "icon": "fa fa-lemon-o",
+      "href": "",
+      "target": "_self",
+      "child": [
+        {
+          "title": "数据迁移管理",
+          "href": "",
+          "icon": "fa fa-adn",
+          "target": "_self",
+          "child": [
+            {
+              "title": "数据导入",
+              "href": "page/dataImport.html",
+              "icon": "fa fa-tachometer",
+              "target": "_self"
+            },
+            {
+              "title": "数据导出",
+              "href": "page/dataExport.html",
+              "icon": "fa fa-tachometer",
+              "target": "_self"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

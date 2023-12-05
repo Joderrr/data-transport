@@ -39,7 +39,7 @@ public class DataObject implements Serializable {
     /**
      * data object related datasource
      */
-    private Long datasourceId;
+    private String datasourceId;
 
     /**
      * data object uuid
@@ -50,6 +50,11 @@ public class DataObject implements Serializable {
      * data object table name
      */
     private String tableName;
+
+    /**
+     * data object query condition
+     */
+    private String queryCondition;
 
     /**
      * data object query script
@@ -88,11 +93,11 @@ public class DataObject implements Serializable {
         this.name = name;
     }
 
-    public Long getDatasourceId() {
+    public String getDatasourceId() {
         return datasourceId;
     }
 
-    public void setDatasourceId(Long datasourceId) {
+    public void setDatasourceId(String datasourceId) {
         this.datasourceId = datasourceId;
     }
 
@@ -110,6 +115,14 @@ public class DataObject implements Serializable {
 
     public void setTableName(String tableName) {
         this.tableName = tableName;
+    }
+
+    public String getQueryCondition() {
+        return queryCondition;
+    }
+
+    public void setQueryCondition(String queryCondition) {
+        this.queryCondition = queryCondition;
     }
 
     public String getQueryScript() {

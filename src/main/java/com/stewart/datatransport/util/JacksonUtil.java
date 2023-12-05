@@ -2,6 +2,7 @@ package com.stewart.datatransport.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.io.IOException;
 
@@ -22,6 +23,7 @@ public class JacksonUtil {
      */
     public static String toJsonString(Object obj) {
         try {
+            mapper.registerModule(new JavaTimeModule());
             return mapper.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
@@ -39,6 +41,7 @@ public class JacksonUtil {
      */
     public static <T> T fromJsonToObject(String jsonStr, Class<T> objClass) {
         try {
+            mapper.registerModule(new JavaTimeModule());
             return mapper.readValue(jsonStr, objClass);
         } catch (IOException e) {
             e.printStackTrace();

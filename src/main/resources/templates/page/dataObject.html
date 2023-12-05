@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>数据迁移工具 - 数据对象管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../lib/layui-v2.6.3/css/layui.css" media="all">
+    <link rel="stylesheet" href="../css/public.css" media="all">
+</head>
+<body>
+    <div class="layuimini-container" id="list">
+        <div class="layuimini-main" >
+            <table class="layui-hide" id="dataTable" lay-filter="currentTableFilter"></table>
+        </div>
+    </div>
+
+    <script src="../lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+    <script src="../lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
+    <script type="text/javascript" th:inline="none">
+        //load datasource list when page is ready
+        $(document).ready(function(){
+            getData('', 10, 1, true);
+        });
+
+        function getData(name, pageSize, pageNum, first){
+            $.ajax({
+                type: 'post',
+                url: '../data/manage/queryDataObjects',
+                processData: false,
+                contentType:'application/json',
+                dataType:"json",
+                data: JSON.stringify({
+                    "queryParam": {
+                        "name": name
+                    },
+                    "pageSize": pageSize,
+                    "pageNum": pageNum
+                }),
+                success: function(res){
+                    var content = res.content;
+                    var records = content.records;
+                    var total = content.total;
+                    var pageSize = content.size;
+                    var currentPage = content.current;
+                    var totalPage = content.pages;
+                    fillTable(records);
+                },
+                error: function(){
+                    alert("没查到数据");
+                }
+            })
+        }
+
+        function fillTable(records){
+            layui.use('table', function(){
+                var table = layui.table;
+                //展示已知数据
+                table.render({
+                    elem: '#dataTable'
+                    ,cols: [[
+                        {field: 'objectUniqueId', title: 'ID', width: 80, sort: true}
+                        ,{field: 'objectName', title: '数据对象名称', width: 150}
+                        ,{field: 'tableName', title: '表名', width: 150}
+                        ,{field: 'queryScript', title: '查询脚本', minWidth: 150}
+                        ,{field: 'datasourceName', title: '依赖的数据源', width: 150}
+                    ]]
+                    ,data: records
+                    ,even: true
+                    ,page: true
+                });
+            });
+        }
+
+    </script>
+</body>
+</html>

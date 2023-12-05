@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>数据迁移工具 - 添加数据集</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../lib/layui-v2.6.3/css/layui.css" media="all">
+</head>
+<body>
+<div class="layuimini-main" id="addpage">
+    <div style="margin: 10px 10px 10px 10px">
+        <div class="layui-form layui-form-pane" action="">
+            <div class="layui-form-item">
+                <label class="layui-form-label">数据集名称</label>
+                <div class="layui-input-block">
+                    <input type="text" id="datasourceName" name="datasourceName" lay-verify="title" autocomplete="off"
+                           placeholder="请输入数据集名称"
+                           class="layui-input">
+                </div>
+            </div>
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                <legend>数据集配置</legend>
+            </fieldset>
+            <div class="layui-form-item" id="rootCircle">
+                <div class="layui-inline">
+                    <label class="layui-form-label">根节点</label>
+                    <div class="layui-input-inline">
+                        <button class="layui-btn" onclick="configRoot()"><i id="configRoot">请配置节点</i></button>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn" onclick="addChildrenForRoot()">添加子节点</button>
+                </div>
+            </div>
+            <div class="layui-form-item" id="childrenNode1" hidden="hidden">
+                <div class="layui-inline">
+                    <label class="layui-form-label">子节点</label>
+                </div>
+                <div class="layui-inline" id="childrenCircle" >
+                    <div class="layui-input-inline">
+                        <div class="layui-input-inline">
+                            <button class="layui-btn" onclick="configChildren1()"><i id="configChildren1">请配置节点</i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-inline" id="childrenCircleButton1" >
+                    <div class="layui-input-inline">
+                        <button class="layui-btn" onclick="addChildrenforChildren1()">添加同级节点</button>
+                    </div>
+                </div>
+                <div class="layui-inline" id="childrenCircleButton1-1" >
+                    <div class="layui-input-inline">
+                        <button class="layui-btn" onclick="addChildrenforChildren1-1()">添加子节点</button>
+                    </div>
+                </div>
+                <div class="layui-inline" id="childrenRemoveButton1" >
+                    <div class="layui-input-inline">
+                        <button class="layui-btn" onclick="removeChildren1()">删除当前节点</button>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item" id="childrenNode2" hidden="hidden">
+                <div class="layui-inline">
+                    <label class="layui-form-label"></label>
+                </div>
+                <div class="layui-inline"  >
+                    <div class="layui-input-inline">
+                        <button class="layui-btn" onclick="configChildren2()"><i id="configChildren2">请配置节点</i></button>
+                    </div>
+                </div>
+                <div class="layui-inline" id="childrenCircleButton2" >
+                    <div class="layui-input-inline">
+                        <button class="layui-btn" onclick="addChildrenforChildren2()">添加同级节点</button>
+                    </div>
+                </div>
+                <div class="layui-inline" id="childrenCircleButton2-1" >
+                    <div class="layui-input-inline">
+                        <button class="layui-btn" onclick="addChildrenforChildren2-1()">添加子节点</button>
+                    </div>
+                </div>
+                <div class="layui-inline" id="childrenRemoveButton2" >
+                    <div class="layui-input-inline">
+                        <button class="layui-btn" onclick="removeChildren2()">删除当前节点</button>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item" id="childrenNode3" hidden="hidden">
+                <div class="layui-inline">
+                    <label class="layui-form-label"></label>
+                </div>
+                <div class="layui-inline"  >
+                    <div class="layui-input-inline">
+                        <button class="layui-btn" onclick="configChildren3()"><i id="configChildren3">请配置节点</i></button>
+                    </div>
+                </div>
+                <div class="layui-inline" id="childrenCircleButton3" >
+                    <div class="layui-input-inline">
+                        <button class="layui-btn" onclick="addChildrenforChildren3()">添加同级节点</button>
+                    </div>
+                </div>
+                <div class="layui-inline" id="childrenCircleButton3-1" >
+                    <div class="layui-input-inline">
+                        <button class="layui-btn" onclick="addChildrenforChildren3-1()">添加子节点</button>
+                    </div>
+                </div>
+                <div class="layui-inline" id="childrenRemoveButton3" >
+                    <div class="layui-input-inline">
+                        <button class="layui-btn" onclick="removeChildren3()">删除当前节点</button>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item" id="childrenNode4" hidden="hidden">
+                <div class="layui-inline">
+                    <label class="layui-form-label"></label>
+                </div>
+                <div class="layui-inline"  >
+                    <div class="layui-input-inline">
+                        <button class="layui-btn" onclick="configChildren4()"><i id="configChildren4">请配置节点</i></button>
+                    </div>
+                </div>
+                <div class="layui-inline" id="childrenCircleButton4" >
+                    <div class="layui-input-inline">
+                        <button class="layui-btn" onclick="addChildrenforChildren4()">添加同级节点</button>
+                    </div>
+                </div>
+                <div class="layui-inline" id="childrenCircleButton4-1" >
+                    <div class="layui-input-inline">
+                        <button class="layui-btn" onclick="addChildrenforChildren4-1()">添加子节点</button>
+                    </div>
+                </div>
+                <div class="layui-inline" id="childrenRemoveButton4" >
+                    <div class="layui-input-inline">
+                        <button class="layui-btn" onclick="removeChildren4()">删除当前节点</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" onclick="checkAndSubmit()">检查并提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script src="../lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
+<script type="text/javascript" th:inline="none">
+    //------------------基础数据初始化及定义---------------------------
+    //是否为根节点
+    var isRoot;
+    //从后端获取的全部数据对象
+    var dataObjects;
+    //数据集配置对象
+    var dataSetConfig = new Map;
+    //数据集配置中包含的所有对象
+    var dataObjectUniqueIds = [];
+    //数据对象关系配置
+    var dataRelations = new Map;
+
+    //配置页面选择的父级对象ID
+    var choosenParentId;
+    //配置页面选择的当前页面的对象ID
+    var choosenCurrId;
+    //关系配置中父级的字段
+    var choosenParentColumn;
+    //关系配置中本级的字段
+    var choosenCurrColumn;
+
+    //从后端获取数据用来初始化数据对象集合，避免每次重复调用
+    $(()=>{
+        $.ajax({
+            type: 'get',
+            url: '../data/manage/queryAll',
+            processData: false,
+            contentType:'application/json',
+            dataType:"json",
+            data: "",
+            success:function(res){
+                console.log("get dataObjects from server");
+                dataObjects = res.content;
+                console.log(dataObjects);
+            },
+            error:function(){
+                console.log("fail to get dataObjects");
+            }
+        });
+    });
+
+    //-------------------------------------------------------------
+
+    //--------------------------------------------------
+    //layui这东西用的不熟，做不到真的动态配置，先这么凑合着够演示就行
+    //配置根节点
+    function configRoot(){
+        isRoot = true;
+        var layer = layui.layer;
+        layer.open({
+            type: 2 //此处以iframe举例
+            ,title: '数据节点配置'
+            ,area: ['390px', '260px']
+            ,shade: 0
+            ,maxmin: true
+            ,content: "datasetConfig"
+            ,btn: '提交'
+            ,btnAlign: 'c' //按钮居中
+            ,yes: function(){
+                console.log(choosenCurrId);
+                if(choosenCurrId != null){
+                    var rootObject ;
+                    for(var i = 0; i < dataObjects.length; i++){
+                        if(dataObjects[i].dataObjectUniqueId == choosenCurrId){
+                            rootObject = dataObjects[i];
+                            dataRelations.set('root', rootObject);
+                            dataRelations.set('rootId', choosenCurrId);
+                            dataObjectUniqueIds.push(choosenCurrId);
+                            dataSetConfig.set("name", $("#datasourceName").val());
+                            dataSetConfig.set('dataObjectUniqueIds', dataObjectUniqueIds);
+                            dataSetConfig.set('dataRelations', dataRelations);
+                        }
+                    }
+                }
+                console.log(dataSetConfig);
+                $("#configRoot").val("已配置 - 重新配置");
+                layer.closeAll();
+            }
+        });
+    }
+
+    //配置子节点1
+    function configChildren1(){
+        isRoot = false;
+        var layer = layui.layer;
+        layer.open({
+            type: 2 //此处以iframe举例
+            ,title: '数据节点配置'
+            ,area: ['390px', '260px']
+            ,shade: 0
+            ,maxmin: true
+            ,content: "datasetConfig"
+            ,btn: '提交'
+            ,btnAlign: 'c' //按钮居中
+            ,yes: function(){
+                console.log(choosenCurrId);
+                console.log(choosenParentId);
+                console.log(choosenParentColumn);
+                console.log(choosenCurrColumn);
+                var children = [];
+                var chil= new Map;
+                var relationship = new Map;
+                relationship.set(choosenParentColumn, [choosenCurrColumn])
+                var currObj = dataObjects.find(obj => obj.dataObjectUniqueId == choosenCurrId);
+                var parentObj = dataObjects.find(obj => obj.dataObjectUniqueId == choosenParentId);
+                chil.set("self", currObj);
+                chil.set("parent", parentObj);
+                chil.set("childId", choosenCurrId);
+                chil.set("relationShip", relationship);
+                children.push(chil);
+                dataRelations.set("children", children);
+                dataSetConfig.delete("dataRelations");
+                dataSetConfig.set("dataRelations", dataRelations);
+                console.log(dataSetConfig);
+                layer.closeAll();
+            }
+        });
+    }
+
+    //配置子节点2
+    function configChildren2(){
+    }
+
+    //配置子节点3
+    function configChildren3(){
+    }
+
+    //配置子节点4
+    function configChildren4(){
+    }
+
+    //--------------------------------------------------
+
+    //---------------------页面元素操作方法-----------------------------
+    var childrenSum = 1;
+    function addChildrenForRoot(){
+        $("#childrenNode1").removeAttr("hidden");
+    }
+
+    function addChildrenforChildren1(){
+        $("#childrenNode2").removeAttr("hidden");
+    }
+
+    function removeChildren1(){
+        $("#childrenNode1").attr("hidden","hidden");
+    }
+
+    function addChildrenforChildren2(){
+        $("#childrenNode3").removeAttr("hidden");
+    }
+
+    function removeChildren2(){
+        $("#childrenNode2").attr("hidden","hidden");
+    }
+
+    function addChildrenforChildren3(){
+        $("#childrenNode4").removeAttr("hidden");
+    }
+
+    function removeChildren3(){
+        $("#childrenNode3").attr("hidden","hidden");
+    }
+
+    function removeChildren4(){
+        $("#childrenNode4").attr("hidden","hidden");
+    }
+
+    //---------------------------------------------
+
+    function checkAndSubmit(){
+        let obj = convertNestedMapListMapToObject(dataSetConfig);
+        if($("#datasourceName").val().length == 0){
+            alert("数据集名称不能为空");
+        } else {
+            console.log(obj)
+            $.ajax({
+                type: 'post',
+                url: '../dataset/manage/saveDataSet',
+                processData: false,
+                contentType:'application/json',
+                dataType:"json",
+                data: JSON.stringify(obj),
+                success:function(res){
+                    console.log(res);
+                    alert("数据集保存成功")
+                },
+                error:function(){
+                    console.log("fail to save dataSet");
+                    alert("数据集保存失败，请查看后端日志")
+                }
+            });
+        }
+    }
+
+    function convertNestedMapListMapToObject(nestedMap) {
+        const result = {};
+
+        nestedMap.forEach((innerMap, key) => {
+            if (innerMap instanceof Map) {
+                result[key] = convertNestedMapListMapToObject(innerMap);
+            } else if (Array.isArray(innerMap)) {
+                result[key] = innerMap.map(item => {
+                    if (item instanceof Map) {
+                        return convertNestedMapListMapToObject(item);
+                    } else {
+                        return item;
+                    }
+                });
+            } else {
+                result[key] = innerMap;
+            }
+        });
+
+        return result;
+    }
+
+</script>
+</body>
+</html>

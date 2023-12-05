@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>数据迁移工具 - 数据集管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../lib/layui-v2.6.3/css/layui.css" media="all">
+    <link rel="stylesheet" href="../css/public.css" media="all">
+</head>
+<body>
+    <div class="layuimini-main" id="addpage">
+        <div style="margin: 10px 10px 10px 10px">
+            <div class="layui-form layui-form-pane" action="">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">当前节点对象</label>
+                    <div class="layui-input-block">
+                        <select id="currentObjectList" onchange="initColumnSelectBorder(this)">
+
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item" id="parentObject" hidden="hidden">
+                    <label class="layui-form-label">父节点对象</label>
+                    <div class="layui-input-block">
+                        <select id="parentObjectList" onchange="initColumnSelectBorder(this)">
+
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item" id="flush" hidden="hidden">
+                    <div class="layui-input-block">
+                        <button onclick="initColumnSelectBorder()">刷新字段信息</button>
+                    </div>
+                </div>
+                <div class="layui-form-item" id="column" hidden="hidden">
+                    <label class="layui-form-label">关联字段</label>
+                    <div class="layui-input-block">
+                        <select id="parentColumn">
+                            <option disabled>请选择父级字段</option>
+
+                        </select>
+                    </div>
+                    <div class="layui-input-block">
+                        <select id="currentColumn">
+                            <option disabled>请选择当前对象字段</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" onclick="save()">暂存配置</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+    <script src="../lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
+    <script type="text/javascript" th:inline="none">
+        $(document).ready(function() {
+            const isRoot = parent.isRoot;
+            console.log(parent.isRoot);
+
+            // 初始化数据
+            initParentSelectedItem();
+
+            if (!isRoot) {
+                $("#parentObject").removeAttr("hidden");
+                $("#column").removeAttr("hidden");
+                $("#flush").removeAttr("hidden");
+            }
+        });
+
+        async function initParentSelectedItem() {
+            var selected = parent.dataObjectUniqueIds;
+            const form = layui.form;
+
+            // 异步加载数据
+            if (!parent.dataObjects) {
+                try {
+                    const res = await $.ajax({
+                        type: 'get',
+                        url: '../data/manage/queryAll',
+                        processData: false,
+                        contentType: 'application/json',
+                        dataType: "json",
+                        data: ""
+                    });
+                    parent.dataObjects = res.content;
+                } catch (error) {
+                    console.error("数据对象获取失败，请检查后端日志", error);
+                    return;
+                }
+            }
+            var selectedObj = [];
+            var datas = parent.dataObjects;
+            for(var i = 0; i < datas.length; i++ ){
+                for(var j = 0; j < selected.length; j++){
+                    if(datas[i].dataObjectUniqueId == selected[j]){
+                        selectedObj.push(datas[i]);
+                    }
+                }
+            }
+            selectedObj.forEach(data => {
+                $("#parentObjectList").append(`<option value="${data.dataObjectUniqueId}">${data.name}</option>`);
+            });
+            // 数据加载成功后，手动调用渲染方法
+            layui.form.render();
+            // 加载当前节点配置
+            loadCurrNodeConf(parent.dataObjects);
+        }
+
+        function initColumnSelectBorder() {
+            console.log("进来了");
+            const parentObjectId = $("#parentObjectList").val();
+            const currentObjectId = $("#currentObjectList").val();
+
+            // 使用 Array.find 替代循环查找
+            const selectedParentObject = parent.dataObjects.find(obj => obj.dataObjectUniqueId == parentObjectId);
+            const selectedCurrentObject = parent.dataObjects.find(obj => obj.dataObjectUniqueId == currentObjectId);
+
+            var target;
+            if(selectedCurrentObject){
+                target = $("#currentColumn");
+                loadColumnSelect(target, selectedCurrentObject.dataStructure);
+            }
+            if(selectedParentObject){
+                target = $("#parentColumn");
+                loadColumnSelect(target, selectedParentObject.dataStructure);
+            }
+            console.log(target)
+            layui.form.render();
+        }
+
+
+        function loadCurrNodeConf(contents) {
+        const form = layui.form;
+        contents.forEach(data => {
+        $("#currentObjectList").append(`<option value="${data.dataObjectUniqueId}">${data.name}</option>`);
+        });
+        form.render();
+        }
+
+        function loadColumnSelect(target, content) {
+        console.log("Content type:", typeof content);
+        console.log("Content value:", content);
+        const form = layui.form;
+        target.empty();  // 清空之前的选项
+
+        try {
+        content = JSON.parse(content);
+        } catch (error) {
+        console.error("Error parsing content:", error);
+        }
+
+        // 使用 Object.entries(content) 获取键值对数组
+        const entries = Object.entries(content);
+
+        // 遍历键值对数组，获取属性键和值
+        entries.forEach(([key, value]) => {
+        target.append(`<option value="${key}">${key}</option>`);
+        });
+
+        form.render();
+        }
+
+        function save() {
+        console.log($("#currentObjectList").val());
+        parent.choosenCurrId = $("#currentObjectList").val();
+        parent.choosenParentId = $("#parentObjectList").val();
+        parent.choosenParentColumn = $("#parentColumn").val();
+        parent.choosenCurrColumn = $("#currentColumn").val();
+        }
+    </script>
+</body>
+</html>

@@ -44,5 +44,28 @@ public interface DataSetManageService {
      */
     GeneralResponse queryDataSet(DataSetConfig dataSetConfig);
 
+    /**
+     * query all dataset configurations
+     *
+     * @return      query result
+     */
+    GeneralResponse queryAll();
+
+    /**
+     * query dataset configuration
+     *
+     * @param dataSetUniqueId     query param
+     * @return      query result
+     */
+    GeneralResponse queryDataSetDetail(String dataSetUniqueId);
+
+    /**
+     * query dataset configuration
+     *
+     * @param dataSetUniqueId     query param
+     * @return      query result
+     */
+    GeneralResponse queryCondition(String dataSetUniqueId);
+
 
 }

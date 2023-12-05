@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>数据迁移工具 - 数据集管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../lib/layui-v2.6.3/css/layui.css" media="all">
+    <link rel="stylesheet" href="../css/public.css" media="all">
+</head>
+<body>
+    <div class="layuimini-container" id="list">
+        <div class="layuimini-main" >
+            <table class="layui-hide" id="dataTable" lay-filter="currentTableFilter"></table>
+        </div>
+    </div>
+
+    <script src="../lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+    <script src="../lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
+    <script type="text/javascript" th:inline="none">
+        //load datasource list when page is ready
+        $(document).ready(function(){
+            getData('', 10, 1, true);
+        });
+
+        function getData(name, pageSize, pageNum, first){
+            $.ajax({
+                type: 'post',
+                url: '../dataset/manage/queryDataSets',
+                processData: false,
+                contentType:'application/json',
+                dataType:"json",
+                data: JSON.stringify({"name": ""}),
+                success: function(res){
+                    var content = res.content;
+                    console.log(content)
+                    fillTable(content);
+                },
+                error: function(){
+                    alert("没查到数据");
+                }
+            })
+        }
+
+        function fillTable(records){
+            layui.use('table', function(){
+                var table = layui.table;
+                //展示已知数据
+                table.render({
+                    elem: '#dataTable'
+                    ,cols: [[
+                        {field: 'dataSetUniqueId', title: 'ID', width: 300, sort: true}
+                        ,{field: 'name', title: '数据集名称', width: 120}
+                        ,{field:'operation', title: '操作'
+                            ,templet: function(d){
+                                return '<button onclick="showDetail(\''+ d.dataSetUniqueId +'\')" class="layui-btn">查看JSON源</button>'
+                            }
+                        }
+                    ]]
+                    ,data: records
+                    ,even: true
+                });
+            });
+        }
+
+        function showDetail(id){
+            var content;
+            $.ajax({
+                type: 'get',
+                url: '../dataset/manage/dataSetDetail/'+id,
+                processData: false,
+                contentType:'application/json',
+                dataType:"json",
+                data:"",
+                success: function(res){
+                    content = res.content;
+                    console.log(content)
+                    var layer = layui.layer
+                    layer.open({
+                        type: 1 //此处以iframe举例
+                        ,title: '以JSON形式展现数据关系'
+                        ,area: ['390px', '260px']
+                        ,shade: 0
+                        ,maxmin: true
+                        ,content: formatJson(JSON.stringify(content))
+                        ,btn: '关闭全部'
+                        ,btnAlign: 'c' //按钮居中
+                        ,yes: function(){
+                            layer.closeAll();
+                        }
+                    });
+                },
+                error: function(){
+                    alert("没查到数据");
+                }
+            })
+
+        }
+
+        function formatJson(jsonStr) {
+            var result = '';
+            var level = 0;
+            var i = 0;
+            var j = 0;
+            var inQuotationMarks = false;
+            var currentChar = null;
+
+            for (i = 0; i < jsonStr.length; i++) {
+                currentChar = jsonStr.charAt(i);
+
+                switch (currentChar) {
+                    case '{':
+                    case '[':
+                        if (!inQuotationMarks) {
+                            result += currentChar + '\n' + indent(level + 1);
+                            level++;
+                        } else {
+                            result += currentChar;
+                        }
+                        break;
+                    case '}':
+                    case ']':
+                        if (!inQuotationMarks) {
+                            level--;
+                            result += '\n' + indent(level) + currentChar;
+                        } else {
+                            result += currentChar;
+                        }
+                        break;
+                    case ',':
+                        if (!inQuotationMarks) {
+                            result += ',\n' + indent(level);
+                        } else {
+                            result += currentChar;
+                        }
+                        break;
+                    case ':':
+                        if (!inQuotationMarks) {
+                            result += ': ';
+                        } else {
+                            result += currentChar;
+                        }
+                        break;
+                    case '"':
+                        if (i > 0 && jsonStr.charAt(i - 1) !== '\\') {
+                            inQuotationMarks = !inQuotationMarks;
+                        }
+                        result += currentChar;
+                        break;
+                    default:
+                        result += currentChar;
+                        break;
+                }
+            }
+
+            return result;
+        }
+
+        function indent(level) {
+            var result = '';
+            var i = 0;
+            for (i = 0; i < level; i++) {
+                result += '  ';
+            }
+            return result;
+        }
+    </script>
+</body>
+</html>
