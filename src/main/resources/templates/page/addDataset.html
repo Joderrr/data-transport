@@ -223,7 +223,11 @@
                     }
                 }
                 console.log(dataSetConfig);
-                $("#configRoot").val("已配置 - 重新配置");
+                // 获取 <i> 标签的引用
+                var italicElement = document.getElementById('configRoot');
+
+                // 替换 <i> 标签中的文本内容
+                italicElement.textContent = rootObject.name;
                 layer.closeAll();
             }
         });
@@ -262,6 +266,11 @@
                 dataSetConfig.delete("dataRelations");
                 dataSetConfig.set("dataRelations", dataRelations);
                 console.log(dataSetConfig);
+                // 获取 <i> 标签的引用
+                var italicElement = document.getElementById('configChildren1');
+
+                // 替换 <i> 标签中的文本内容
+                italicElement.textContent = currObj.name;
                 layer.closeAll();
             }
         });

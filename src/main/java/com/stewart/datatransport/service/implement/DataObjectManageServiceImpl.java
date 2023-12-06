@@ -76,9 +76,11 @@ public class DataObjectManageServiceImpl extends BaseService implements DataObje
      */
     @Override
     public GeneralResponse saveDataObject(DataObjectConfig configuration) {
+        configuration.setFieldMap(SqlAnalyzer.extractFields(configuration.getQueryScript()));
         configuration.setObjectUniqueId(generateUuid());
         configuration.setTableName(SqlAnalyzer.extractSingleTableName(configuration.getQueryScript()));
         configuration.setQueryCondition(SqlAnalyzer.extractFieldsFromWhereClause(configuration.getQueryScript()));
+        configuration.setQueryScript(SqlAnalyzer.convertToPlaceholders(configuration.getQueryScript()));
         int insert = dataObjectMapper.insert(configuration.toPersistent());
         return generateResponseObject(insert > 0, configuration, "data object insert failure");
     }

@@ -75,7 +75,7 @@ public class DatabaseManageController extends BaseController {
     }
 
     /**
-     * search database configuration page
+     * search all database configurations
      *
      * @return query result
      */
