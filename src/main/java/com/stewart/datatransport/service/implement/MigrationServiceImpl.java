@@ -4,9 +4,11 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.stewart.datatransport.component.DatabaseOperation;
+import com.stewart.datatransport.mapper.DataMigrateRecordMapper;
 import com.stewart.datatransport.mapper.DataSetMapper;
 import com.stewart.datatransport.mapper.DatabaseConfigMapper;
 import com.stewart.datatransport.pojo.dto.MigrationData;
+import com.stewart.datatransport.pojo.persistent.DataMigrateRecord;
 import com.stewart.datatransport.pojo.persistent.DataObject;
 import com.stewart.datatransport.pojo.persistent.DataSet;
 import com.stewart.datatransport.pojo.persistent.DatabaseConfig;
@@ -50,6 +52,9 @@ public class MigrationServiceImpl extends BaseService implements MigrationServic
     @Resource
     DatabaseOperation databaseOperation;
 
+    @Resource
+    DataMigrateRecordMapper recordMapper;
+
     /**
      * @see MigrationService#generateMigratePackage(String, Map, HttpServletResponse)
      */
@@ -85,6 +90,11 @@ public class MigrationServiceImpl extends BaseService implements MigrationServic
         response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
         MigrationData migrationData = new MigrationData(dataSetConfig, allData);
         ServletOutputStream outputStream = null;
+        try{
+            recordMigrationInfo(dataSetConfig.getName(),"export", "migration_data.json");
+        }catch (Exception e){
+            log.error("save export migration info failed");
+        }
         try {
             outputStream = response.getOutputStream();
             outputStream.write(JSON.toJSONBytes(migrationData));
@@ -182,6 +192,11 @@ public class MigrationServiceImpl extends BaseService implements MigrationServic
                 value.forEach(v -> databaseOperation.executeInsertScript(
                         dataSourceConfig, v));
             }
+            try{
+                recordMigrationInfo(dataSetConfig.getName(),"import", file.getOriginalFilename());
+            }catch (Exception e){
+                log.error("save import migration info failed");
+            }
             return generateResponseObject(true);
         } catch (Exception e) {
             log.error("An exception occurs while parsing file to MigrationData, exception : {}", e.getMessage(), e);
@@ -248,6 +263,16 @@ public class MigrationServiceImpl extends BaseService implements MigrationServic
         front.append(") ");
         end.append(");");
         return preStr + front + middile + end;
+    }
+
+    private boolean recordMigrationInfo(String dataSetName, String type, String fileName){
+        DataMigrateRecord record = new DataMigrateRecord();
+        record.setMigrateSets(dataSetName);
+        record.setMigrateType(type);
+        record.setMigrateUniqueId(generateUuid());
+        record.setFileName(fileName);
+        record.setFileUrl("local");
+        return recordMapper.insert(record) > 0;
     }
 
 }
