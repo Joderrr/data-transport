@@ -192,7 +192,7 @@
     //-------------------------------------------------------------
 
     //--------------------------------------------------
-    //layui这东西用的不熟，做不到真的动态配置，先这么凑合着够演示就行
+    //layui这东西用的不熟，做不到真的动态配置，先这么凑合着够用就行，平时使用的时候也不用页面去配置
     //配置根节点
     function configRoot(){
         isRoot = true;
@@ -278,14 +278,128 @@
 
     //配置子节点2
     function configChildren2(){
+        isRoot = false;
+        var layer = layui.layer;
+        layer.open({
+            type: 2 //此处以iframe举例
+            ,title: '数据节点配置'
+            ,area: ['390px', '260px']
+            ,shade: 0
+            ,maxmin: true
+            ,content: "datasetConfig"
+            ,btn: '提交'
+            ,btnAlign: 'c' //按钮居中
+            ,yes: function(){
+                console.log(choosenCurrId);
+                console.log(choosenParentId);
+                console.log(choosenParentColumn);
+                console.log(choosenCurrColumn);
+                var children = [];
+                var chil= new Map;
+                var relationship = new Map;
+                relationship.set(choosenParentColumn, [choosenCurrColumn])
+                var currObj = dataObjects.find(obj => obj.dataObjectUniqueId == choosenCurrId);
+                var parentObj = dataObjects.find(obj => obj.dataObjectUniqueId == choosenParentId);
+                chil.set("self", currObj);
+                chil.set("parent", parentObj);
+                chil.set("childId", choosenCurrId);
+                chil.set("relationShip", relationship);
+                children.push(chil);
+                dataSetConfig.delete("dataRelations");
+                dataSetConfig.set("dataRelations", recursionSetChildren(dataRelations, choosenParentId, children));
+                console.log(dataSetConfig);
+                // 获取 <i> 标签的引用
+                var italicElement = document.getElementById('configChildren2');
+
+                // 替换 <i> 标签中的文本内容
+                italicElement.textContent = currObj.name;
+                layer.closeAll();
+            }
+        });
     }
 
     //配置子节点3
     function configChildren3(){
+        isRoot = false;
+        var layer = layui.layer;
+        layer.open({
+            type: 2 //此处以iframe举例
+            ,title: '数据节点配置'
+            ,area: ['390px', '260px']
+            ,shade: 0
+            ,maxmin: true
+            ,content: "datasetConfig"
+            ,btn: '提交'
+            ,btnAlign: 'c' //按钮居中
+            ,yes: function(){
+                console.log(choosenCurrId);
+                console.log(choosenParentId);
+                console.log(choosenParentColumn);
+                console.log(choosenCurrColumn);
+                var children = [];
+                var chil= new Map;
+                var relationship = new Map;
+                relationship.set(choosenParentColumn, [choosenCurrColumn])
+                var currObj = dataObjects.find(obj => obj.dataObjectUniqueId == choosenCurrId);
+                var parentObj = dataObjects.find(obj => obj.dataObjectUniqueId == choosenParentId);
+                chil.set("self", currObj);
+                chil.set("parent", parentObj);
+                chil.set("childId", choosenCurrId);
+                chil.set("relationShip", relationship);
+                children.push(chil);
+                dataSetConfig.delete("dataRelations");
+                dataSetConfig.set("dataRelations", recursionSetChildren(dataRelations, choosenParentId, children));
+                console.log(dataSetConfig);
+                // 获取 <i> 标签的引用
+                var italicElement = document.getElementById('configChildren3');
+
+                // 替换 <i> 标签中的文本内容
+                italicElement.textContent = currObj.name;
+                layer.closeAll();
+            }
+        });
     }
 
     //配置子节点4
     function configChildren4(){
+        isRoot = false;
+        var layer = layui.layer;
+        layer.open({
+            type: 2 //此处以iframe举例
+            ,title: '数据节点配置'
+            ,area: ['390px', '260px']
+            ,shade: 0
+            ,maxmin: true
+            ,content: "datasetConfig"
+            ,btn: '提交'
+            ,btnAlign: 'c' //按钮居中
+            ,yes: function(){
+                console.log(choosenCurrId);
+                console.log(choosenParentId);
+                console.log(choosenParentColumn);
+                console.log(choosenCurrColumn);
+                var children = [];
+                var chil= new Map;
+                var relationship = new Map;
+                relationship.set(choosenParentColumn, [choosenCurrColumn])
+                var currObj = dataObjects.find(obj => obj.dataObjectUniqueId == choosenCurrId);
+                var parentObj = dataObjects.find(obj => obj.dataObjectUniqueId == choosenParentId);
+                chil.set("self", currObj);
+                chil.set("parent", parentObj);
+                chil.set("childId", choosenCurrId);
+                chil.set("relationShip", relationship);
+                children.push(chil);
+                dataSetConfig.delete("dataRelations");
+                dataSetConfig.set("dataRelations", recursionSetChildren(dataRelations, choosenParentId, children));
+                console.log(dataSetConfig);
+                // 获取 <i> 标签的引用
+                var italicElement = document.getElementById('configChildren4');
+
+                // 替换 <i> 标签中的文本内容
+                italicElement.textContent = currObj.name;
+                layer.closeAll();
+            }
+        });
     }
 
     //--------------------------------------------------
@@ -373,6 +487,20 @@
         return result;
     }
 
+    function recursionSetChildren(relation, choosenParentId, children){
+        if(relation.get("children")){
+            var cur = relation.get("children");
+            if(cur.get("childId") == choosenParentId){
+                cur.set("children", children);
+                relation.set("children", cur);
+            } else {
+                relation.set("children", recursionSetChildren(cur, choosenParentId, children))
+            }
+        } else if(relation.get("rootId") == choosenParentId){
+            relation.set("children", children);
+        }
+        return relation;
+    }
 </script>
 </body>
 </html>
